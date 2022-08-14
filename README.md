@@ -31,11 +31,6 @@ While editing text:
 * `ctrl+=` to zoom in, `ctrl+-` to zoom out, `ctrl+0` to reset zoom
 * `alt+right`/`alt+left` to jump to the next/previous word, respectively
 
-For shortcuts while editing drawings, consult the online help. Either:
-* hover on a drawing and hit `ctrl+h`, or
-* click on a drawing to start a stroke and then press and hold `h` to see your
-  options at any point during a stroke.
-
 Exclusively tested so far with a US keyboard layout. If
 you use a different layout, please let me know if things worked, or if you
 found anything amiss: http://akkartik.name/contact
@@ -51,20 +46,6 @@ found anything amiss: http://akkartik.name/contact
 
 * If you kill the process, say by force-quitting because things things get
   sluggish, you can lose data.
-
-* The text cursor will always stay on the screen. This can have some strange
-  implications:
-
-    * A long series of drawings will get silently skipped when you hit
-      page-down, until a line of text can be showed on screen.
-    * If there's no line of text at the top of the file, you may not be able
-      to scroll back up to the top with page-up.
-
-  So far this app isn't really designed for drawing-heavy files. For now I'm
-  targeting mostly-text files with a few drawings mixed in.
-
-* No clipping yet for drawings. In particular, circles/squares/rectangles and
-  point labels can overflow a drawing.
 
 * Long wrapping lines can't yet distinguish between the cursor at end of one
   screen line and start of the next, so clicking the mouse to position the

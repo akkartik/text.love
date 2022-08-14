@@ -256,8 +256,6 @@ function edit.keychord_pressed(State, chord, key)
       State.selection1 = deepcopy(src.selection)
       patch(State.lines, event.after, event.before)
       patch_placeholders(State.line_cache, event.after, event.before)
-      -- invalidate various cached bits of lines
-      State.lines.current_drawing = nil
       -- if we're scrolling, reclaim all fragments to avoid memory leaks
       Text.redraw_all(State)
       schedule_save(State)
@@ -271,8 +269,6 @@ function edit.keychord_pressed(State, chord, key)
       State.cursor1 = deepcopy(src.cursor)
       State.selection1 = deepcopy(src.selection)
       patch(State.lines, event.before, event.after)
-      -- invalidate various cached bits of lines
-      State.lines.current_drawing = nil
       -- if we're scrolling, reclaim all fragments to avoid memory leaks
       Text.redraw_all(State)
       schedule_save(State)

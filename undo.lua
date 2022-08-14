@@ -50,8 +50,6 @@ function snapshot(State, s,e)
     screen_top=deepcopy(State.screen_top1),
     selection=deepcopy(State.selection1),
     cursor=deepcopy(State.cursor1),
-    current_drawing_mode=Drawing_mode,
-    previous_drawing_mode=State.previous_drawing_mode,
     lines={},
     start_line=s,
     end_line=e,
