@@ -1,10 +1,11 @@
-# Plain text with lines
+# An editor for plain text.
 
-An editor for plain text where you can also seamlessly insert line drawings.
+Not very useful by itself, but it's a fork of [lines.love](http://akkartik.name/lines.html)
+that you can take in other directions besides line drawings, while easily
+sharing patches between forks.
+
 Designed above all to be easy to modify and give you early warning if your
 modifications break something.
-
-http://akkartik.name/lines.html
 
 ## Invocation
 
@@ -13,13 +14,13 @@ optionally with a file path to edit.
 
 Alternatively, turn it into a .love file you can double-click on:
 ```
-$ zip -r /tmp/lines.love *.lua
+$ zip -r /tmp/text.love *.lua
 ```
 
-By default, lines.love reads/writes the file `lines.txt` in your default
+By default, it reads/writes the file `lines.txt` in your default
 user/home directory (`https://love2d.org/wiki/love.filesystem.getUserDirectory`).
 
-To open a different file, drop it on the lines.love window.
+To open a different file, drop it on the app window.
 
 ## Keyboard shortcuts
 
@@ -35,7 +36,7 @@ For shortcuts while editing drawings, consult the online help. Either:
 * click on a drawing to start a stroke and then press and hold `h` to see your
   options at any point during a stroke.
 
-lines.love has been exclusively tested so far with a US keyboard layout. If
+Exclusively tested so far with a US keyboard layout. If
 you use a different layout, please let me know if things worked, or if you
 found anything amiss: http://akkartik.name/contact
 
@@ -46,8 +47,7 @@ found anything amiss: http://akkartik.name/contact
 * No support yet for right-to-left languages.
 
 * Undo/redo may be sluggish in large files. Large files may grow sluggish in
-  other ways. lines.love works well in all circumstances with files under
-  50KB.
+  other ways. Works well in all circumstances with files under 50KB.
 
 * If you kill the process, say by force-quitting because things things get
   sluggish, you can lose data.
@@ -80,28 +80,19 @@ found anything amiss: http://akkartik.name/contact
 
 ## Mirrors and Forks
 
-Updates to lines.love can be downloaded from the following mirrors in addition
-to the website above:
-* https://github.com/akkartik/lines.love
-* https://repo.or.cz/lines.love.git
-* https://codeberg.org/akkartik/lines.love
-* https://tildegit.org/akkartik/lines.love
-* https://git.tilde.institute/akkartik/lines.love
-* https://git.sr.ht/~akkartik/lines.love
-* https://notabug.org/akkartik/lines.love
-* https://pagure.io/lines.love
+This repo is a fork of lines.love at [http://akkartik.name/lines.html](http://akkartik.name/lines.html).
+Updates to it can be downloaded from the following mirrors:
 
-Forks of lines.love are encouraged. If you show me your fork, I'll link to it
-here.
+* https://codeberg.org/akkartik/text.love
+* https://repo.or.cz/text.love.git
+* https://tildegit.org/akkartik/text.love
+* https://git.tilde.institute/akkartik/text.love
+* https://git.sr.ht/~akkartik/text.love
+* https://notabug.org/akkartik/text.love
+* https://github.com/akkartik/text.love
+* https://pagure.io/text.love
 
-* https://github.com/akkartik/lines-polygon-experiment -- an experiment that
-  uses separate shortcuts for regular polygons. `ctrl+3` for triangles,
-  `ctrl+4` for squares, etc.
-
-## Associated tools
-
-* https://codeberg.org/akkartik/lines2md exports lines.love files to Markdown
-  and (non-editable) SVG.
+Further forks are encouraged. If you show me your fork, I'll link to it here.
 
 ## Feedback
 

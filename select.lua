@@ -53,19 +53,19 @@ end
 -- Returns some intermediate computation useful elsewhere.
 function Text.draw_highlight(State, line, x,y, pos, lo,hi)
   if lo then
-    local lo_offset = Text.offset(line.data, lo)
-    local hi_offset = Text.offset(line.data, hi)
-    local pos_offset = Text.offset(line.data, pos)
+    local lo_offset = Text.offset(line, lo)
+    local hi_offset = Text.offset(line, hi)
+    local pos_offset = Text.offset(line, pos)
     local lo_px
     if pos == lo then
       lo_px = 0
     else
-      local before = line.data:sub(pos_offset, lo_offset-1)
+      local before = line:sub(pos_offset, lo_offset-1)
       local before_text = App.newText(love.graphics.getFont(), before)
       lo_px = App.width(before_text)
     end
 --?     print(lo,pos,hi, '--', lo_offset,pos_offset,hi_offset, '--', lo_px)
-    local s = line.data:sub(lo_offset, hi_offset-1)
+    local s = line:sub(lo_offset, hi_offset-1)
     local text = App.newText(love.graphics.getFont(), s)
     local text_width = App.width(text)
     App.color(Highlight_color)
@@ -92,10 +92,8 @@ end
 
 function Text.to_pos(State, x,y)
   for line_index,line in ipairs(State.lines) do
-    if line.mode == 'text' then
-      if Text.in_line(State, line_index, x,y) then
-        return line_index, Text.to_pos_on_line(State, line_index, x,y)
-      end
+    if Text.in_line(State, line_index, x,y) then
+      return line_index, Text.to_pos_on_line(State, line_index, x,y)
     end
   end
 end
@@ -138,20 +136,20 @@ function Text.delete_selection_without_undo(State)
   State.selection1 = {}
   -- delete everything between min (inclusive) and max (exclusive)
   Text.clear_screen_line_cache(State, minl)
-  local min_offset = Text.offset(State.lines[minl].data, minp)
-  local max_offset = Text.offset(State.lines[maxl].data, maxp)
+  local min_offset = Text.offset(State.lines[minl], minp)
+  local max_offset = Text.offset(State.lines[maxl], maxp)
   if minl == maxl then
 --?     print('minl == maxl')
-    State.lines[minl].data = State.lines[minl].data:sub(1, min_offset-1)..State.lines[minl].data:sub(max_offset)
+    State.lines[minl] = State.lines[minl]:sub(1, min_offset-1)..State.lines[minl]:sub(max_offset)
     return
   end
   assert(minl < maxl)
-  local rhs = State.lines[maxl].data:sub(max_offset)
+  local rhs = State.lines[maxl]:sub(max_offset)
   for i=maxl,minl+1,-1 do
     table.remove(State.lines, i)
     table.remove(State.line_cache, i)
   end
-  State.lines[minl].data = State.lines[minl].data:sub(1, min_offset-1)..rhs
+  State.lines[minl] = State.lines[minl]:sub(1, min_offset-1)..rhs
 end
 
 function Text.selection(State)
@@ -167,18 +165,16 @@ function Text.selection(State)
       minp,maxp = maxp,minp
     end
   end
-  local min_offset = Text.offset(State.lines[minl].data, minp)
-  local max_offset = Text.offset(State.lines[maxl].data, maxp)
+  local min_offset = Text.offset(State.lines[minl], minp)
+  local max_offset = Text.offset(State.lines[maxl], maxp)
   if minl == maxl then
-    return State.lines[minl].data:sub(min_offset, max_offset-1)
+    return State.lines[minl]:sub(min_offset, max_offset-1)
   end
   assert(minl < maxl)
-  local result = {State.lines[minl].data:sub(min_offset)}
+  local result = {State.lines[minl]:sub(min_offset)}
   for i=minl+1,maxl-1 do
-    if State.lines[i].mode == 'text' then
-      table.insert(result, State.lines[i].data)
-    end
+    table.insert(result, State.lines[i])
   end
-  table.insert(result, State.lines[maxl].data:sub(1, max_offset-1))
+  table.insert(result, State.lines[maxl]:sub(1, max_offset-1))
   return table.concat(result, '\n')
 end
