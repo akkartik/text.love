@@ -57,7 +57,6 @@ function snapshot(State, s,e)
   }
   -- deep copy lines without cached stuff like text fragments
   for i=s,e do
-    local line = State.lines[i]
     table.insert(event.lines, State.lines[i])
   end
   return event
