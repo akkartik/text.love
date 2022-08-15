@@ -12,11 +12,11 @@ function load_from_file(infile)
     while true do
       local line = infile_next_line()
       if line == nil then break end
-      table.insert(result, line)
+      table.insert(result, {data=line})
     end
   end
   if #result == 0 then
-    table.insert(result, '')
+    table.insert(result, {data=''})
   end
   return result
 end
@@ -27,7 +27,7 @@ function save_to_disk(State)
     error('failed to write to "'..State.filename..'"')
   end
   for _,line in ipairs(State.lines) do
-    outfile:write(line, '\n')
+    outfile:write(line.data, '\n')
   end
   outfile:close()
 end
@@ -40,10 +40,10 @@ function load_array(a)
   while true do
     i,line = next_line(a, i)
     if i == nil then break end
-    table.insert(result, line)
+    table.insert(result, {data=line})
   end
   if #result == 0 then
-    table.insert(result, '')
+    table.insert(result, {data=''})
   end
   return result
 end

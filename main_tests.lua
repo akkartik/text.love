@@ -38,9 +38,9 @@ function test_drop_file()
   }
   App.filedropped(fake_dropped_file)
   check_eq(#Editor_state.lines, 3, 'F - test_drop_file/#lines')
-  check_eq(Editor_state.lines[1], 'abc', 'F - test_drop_file/lines:1')
-  check_eq(Editor_state.lines[2], 'def', 'F - test_drop_file/lines:2')
-  check_eq(Editor_state.lines[3], 'ghi', 'F - test_drop_file/lines:3')
+  check_eq(Editor_state.lines[1].data, 'abc', 'F - test_drop_file/lines:1')
+  check_eq(Editor_state.lines[2].data, 'def', 'F - test_drop_file/lines:2')
+  check_eq(Editor_state.lines[3].data, 'ghi', 'F - test_drop_file/lines:3')
 end
 
 function test_drop_file_saves_previous()

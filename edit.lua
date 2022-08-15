@@ -18,7 +18,7 @@ edit = {}
 -- run in both tests and a real run
 function edit.initialize_state(top, left, right, font_height, line_height)  -- currently always draws to bottom of screen
   local result = {
-    lines = {''},  -- array of strings
+    lines = {{data=''}},  -- array of strings
 
     -- Lines can be too long to fit on screen, in which case they _wrap_ into
     -- multiple _screen lines_.
@@ -106,7 +106,7 @@ function edit.draw(State)
   if State.cursor_y == -1 then
     State.cursor_y = App.screen.height
   end
---?   print('screen bottom: '..tostring(State.screen_bottom1.pos)..' in '..tostring(State.lines[State.screen_bottom1.line]))
+--?   print('screen bottom: '..tostring(State.screen_bottom1.pos)..' in '..tostring(State.lines[State.screen_bottom1.line].data))
   if State.search_term then
     Text.draw_search_bar(State)
   end

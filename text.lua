@@ -50,7 +50,7 @@ function Text.draw(State, line_index, y, startpos)
       if line_index == State.cursor1.line then
         if pos <= State.cursor1.pos and pos + frag_len > State.cursor1.pos then
           if State.search_term then
-            if State.lines[State.cursor1.line]:sub(State.cursor1.pos, State.cursor1.pos+utf8.len(State.search_term)-1) == State.search_term then
+            if State.lines[State.cursor1.line].data:sub(State.cursor1.pos, State.cursor1.pos+utf8.len(State.search_term)-1) == State.search_term then
               local lo_px = Text.draw_highlight(State, line, x,y, pos, State.cursor1.pos, State.cursor1.pos+utf8.len(State.search_term))
               App.color(Text_color)
               love.graphics.print(State.search_term, x+lo_px,y)
@@ -92,7 +92,7 @@ function Text.compute_fragments(State, line_index)
   line_cache.fragments = {}
   local x = State.left
   -- try to wrap at word boundaries
-  for frag in line:gmatch('%S*%s*') do
+  for frag in line.data:gmatch('%S*%s*') do
     local frag_text = App.newText(love.graphics.getFont(), frag)
     local frag_width = App.width(frag_text)
 --?     print('x: '..tostring(x)..'; '..tostring(State.right-x)..'px to go')
@@ -142,8 +142,8 @@ function Text.textinput(State, t)
 end
 
 function Text.insert_at_cursor(State, t)
-  local byte_offset = Text.offset(State.lines[State.cursor1.line], State.cursor1.pos)
-  State.lines[State.cursor1.line] = string.sub(State.lines[State.cursor1.line], 1, byte_offset-1)..t..string.sub(State.lines[State.cursor1.line], byte_offset)
+  local byte_offset = Text.offset(State.lines[State.cursor1.line].data, State.cursor1.pos)
+  State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_offset-1)..t..string.sub(State.lines[State.cursor1.line].data, byte_offset)
   Text.clear_screen_line_cache(State, State.cursor1.line)
   State.cursor1.pos = State.cursor1.pos+1
 end
@@ -182,21 +182,21 @@ function Text.keychord_pressed(State, chord)
     local before
     if State.cursor1.pos > 1 then
       before = snapshot(State, State.cursor1.line)
-      local byte_start = utf8.offset(State.lines[State.cursor1.line], State.cursor1.pos-1)
-      local byte_end = utf8.offset(State.lines[State.cursor1.line], State.cursor1.pos)
+      local byte_start = utf8.offset(State.lines[State.cursor1.line].data, State.cursor1.pos-1)
+      local byte_end = utf8.offset(State.lines[State.cursor1.line].data, State.cursor1.pos)
       if byte_start then
         if byte_end then
-          State.lines[State.cursor1.line] = string.sub(State.lines[State.cursor1.line], 1, byte_start-1)..string.sub(State.lines[State.cursor1.line], byte_end)
+          State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_start-1)..string.sub(State.lines[State.cursor1.line].data, byte_end)
         else
-          State.lines[State.cursor1.line] = string.sub(State.lines[State.cursor1.line], 1, byte_start-1)
+          State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_start-1)
         end
         State.cursor1.pos = State.cursor1.pos-1
       end
     elseif State.cursor1.line > 1 then
       before = snapshot(State, State.cursor1.line-1, State.cursor1.line)
       -- join lines
-      State.cursor1.pos = utf8.len(State.lines[State.cursor1.line-1])+1
-      State.lines[State.cursor1.line-1] = State.lines[State.cursor1.line-1]..State.lines[State.cursor1.line]
+      State.cursor1.pos = utf8.len(State.lines[State.cursor1.line-1].data)+1
+      State.lines[State.cursor1.line-1].data = State.lines[State.cursor1.line-1].data..State.lines[State.cursor1.line].data
       table.remove(State.lines, State.cursor1.line)
       table.remove(State.line_cache, State.cursor1.line)
       State.cursor1.line = State.cursor1.line-1
@@ -222,25 +222,25 @@ function Text.keychord_pressed(State, chord)
       return
     end
     local before
-    if State.cursor1.pos <= utf8.len(State.lines[State.cursor1.line]) then
+    if State.cursor1.pos <= utf8.len(State.lines[State.cursor1.line].data) then
       before = snapshot(State, State.cursor1.line)
     else
       before = snapshot(State, State.cursor1.line, State.cursor1.line+1)
     end
-    if State.cursor1.pos <= utf8.len(State.lines[State.cursor1.line]) then
-      local byte_start = utf8.offset(State.lines[State.cursor1.line], State.cursor1.pos)
-      local byte_end = utf8.offset(State.lines[State.cursor1.line], State.cursor1.pos+1)
+    if State.cursor1.pos <= utf8.len(State.lines[State.cursor1.line].data) then
+      local byte_start = utf8.offset(State.lines[State.cursor1.line].data, State.cursor1.pos)
+      local byte_end = utf8.offset(State.lines[State.cursor1.line].data, State.cursor1.pos+1)
       if byte_start then
         if byte_end then
-          State.lines[State.cursor1.line] = string.sub(State.lines[State.cursor1.line], 1, byte_start-1)..string.sub(State.lines[State.cursor1.line], byte_end)
+          State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_start-1)..string.sub(State.lines[State.cursor1.line].data, byte_end)
         else
-          State.lines[State.cursor1.line] = string.sub(State.lines[State.cursor1.line], 1, byte_start-1)
+          State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_start-1)
         end
         -- no change to State.cursor1.pos
       end
     elseif State.cursor1.line < #State.lines then
       -- join lines
-      State.lines[State.cursor1.line] = State.lines[State.cursor1.line]..State.lines[State.cursor1.line+1]
+      State.lines[State.cursor1.line].data = State.lines[State.cursor1.line].data..State.lines[State.cursor1.line+1].data
       table.remove(State.lines, State.cursor1.line+1)
       table.remove(State.line_cache, State.cursor1.line+1)
     end
@@ -333,10 +333,10 @@ function Text.keychord_pressed(State, chord)
 end
 
 function Text.insert_return(State)
-  local byte_offset = Text.offset(State.lines[State.cursor1.line], State.cursor1.pos)
-  table.insert(State.lines, State.cursor1.line+1, string.sub(State.lines[State.cursor1.line], byte_offset))
+  local byte_offset = Text.offset(State.lines[State.cursor1.line].data, State.cursor1.pos)
+  table.insert(State.lines, State.cursor1.line+1, {data=string.sub(State.lines[State.cursor1.line].data, byte_offset)})
   table.insert(State.line_cache, State.cursor1.line+1, {})
-  State.lines[State.cursor1.line] = string.sub(State.lines[State.cursor1.line], 1, byte_offset-1)
+  State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_offset-1)
   Text.clear_screen_line_cache(State, State.cursor1.line)
   State.cursor1.line = State.cursor1.line+1
   State.cursor1.pos = 1
@@ -409,8 +409,8 @@ function Text.up(State)
         State.screen_top1.pos = screen_line_starting_pos
 --?         print('pos of top of screen is also '..tostring(State.screen_top1.pos)..' of the same line')
       end
-      local screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line], screen_line_starting_pos)
-      local s = string.sub(State.lines[State.cursor1.line], screen_line_starting_byte_offset)
+      local screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line].data, screen_line_starting_pos)
+      local s = string.sub(State.lines[State.cursor1.line].data, screen_line_starting_byte_offset)
       State.cursor1.pos = screen_line_starting_pos + Text.nearest_cursor_pos(s, State.cursor_x, State.left) - 1
     end
     if State.cursor1.line < State.screen_top1.line then
@@ -426,8 +426,8 @@ function Text.up(State)
       State.screen_top1.pos = new_screen_line_starting_pos
 --?       print('also setting pos of top of screen to '..tostring(State.screen_top1.pos))
     end
-    local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line], new_screen_line_starting_pos)
-    local s = string.sub(State.lines[State.cursor1.line], new_screen_line_starting_byte_offset)
+    local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line].data, new_screen_line_starting_pos)
+    local s = string.sub(State.lines[State.cursor1.line].data, new_screen_line_starting_byte_offset)
     State.cursor1.pos = new_screen_line_starting_pos + Text.nearest_cursor_pos(s, State.cursor_x, State.left) - 1
 --?     print('cursor pos is now '..tostring(State.cursor1.pos))
   end
@@ -441,7 +441,7 @@ function Text.down(State)
     if State.cursor1.line < #State.lines then
       local new_cursor_line = State.cursor1.line+1
       State.cursor1.line = new_cursor_line
-      State.cursor1.pos = Text.nearest_cursor_pos(State.lines[State.cursor1.line], State.cursor_x, State.left)
+      State.cursor1.pos = Text.nearest_cursor_pos(State.lines[State.cursor1.line].data, State.cursor_x, State.left)
 --?       print(State.cursor1.pos)
     end
     if State.cursor1.line > State.screen_bottom1.line then
@@ -460,8 +460,8 @@ function Text.down(State)
     local screen_line_index, screen_line_starting_pos = Text.pos_at_start_of_cursor_screen_line(State)
     new_screen_line_starting_pos = State.line_cache[State.cursor1.line].screen_line_starting_pos[screen_line_index+1]
 --?     print('switching pos of screen line at cursor from '..tostring(screen_line_starting_pos)..' to '..tostring(new_screen_line_starting_pos))
-    local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line], new_screen_line_starting_pos)
-    local s = string.sub(State.lines[State.cursor1.line], new_screen_line_starting_byte_offset)
+    local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line].data, new_screen_line_starting_pos)
+    local s = string.sub(State.lines[State.cursor1.line].data, new_screen_line_starting_byte_offset)
     State.cursor1.pos = new_screen_line_starting_pos + Text.nearest_cursor_pos(s, State.cursor_x, State.left) - 1
 --?     print('cursor pos is now', State.cursor1.line, State.cursor1.pos)
     if scroll_down then
@@ -481,7 +481,7 @@ function Text.start_of_line(State)
 end
 
 function Text.end_of_line(State)
-  State.cursor1.pos = utf8.len(State.lines[State.cursor1.line]) + 1
+  State.cursor1.pos = utf8.len(State.lines[State.cursor1.line].data) + 1
   local _,botpos = Text.pos_at_start_of_cursor_screen_line(State)
   local botline1 = {line=State.cursor1.line, pos=botpos}
   if Text.cursor_past_screen_bottom(State) then
@@ -495,7 +495,7 @@ function Text.word_left(State)
     if State.cursor1.pos == 1 then
       break
     end
-    if Text.match(State.lines[State.cursor1.line], State.cursor1.pos-1, '%S') then
+    if Text.match(State.lines[State.cursor1.line].data, State.cursor1.pos-1, '%S') then
       break
     end
     Text.left(State)
@@ -507,7 +507,7 @@ function Text.word_left(State)
       break
     end
     assert(State.cursor1.pos > 1)
-    if Text.match(State.lines[State.cursor1.line], State.cursor1.pos-1, '%s') then
+    if Text.match(State.lines[State.cursor1.line].data, State.cursor1.pos-1, '%s') then
       break
     end
   end
@@ -516,20 +516,20 @@ end
 function Text.word_right(State)
   -- skip some whitespace
   while true do
-    if State.cursor1.pos > utf8.len(State.lines[State.cursor1.line]) then
+    if State.cursor1.pos > utf8.len(State.lines[State.cursor1.line].data) then
       break
     end
-    if Text.match(State.lines[State.cursor1.line], State.cursor1.pos, '%S') then
+    if Text.match(State.lines[State.cursor1.line].data, State.cursor1.pos, '%S') then
       break
     end
     Text.right_without_scroll(State)
   end
   while true do
     Text.right_without_scroll(State)
-    if State.cursor1.pos > utf8.len(State.lines[State.cursor1.line]) then
+    if State.cursor1.pos > utf8.len(State.lines[State.cursor1.line].data) then
       break
     end
-    if Text.match(State.lines[State.cursor1.line], State.cursor1.pos, '%s') then
+    if Text.match(State.lines[State.cursor1.line].data, State.cursor1.pos, '%s') then
       break
     end
   end
@@ -552,7 +552,7 @@ function Text.left(State)
     State.cursor1.pos = State.cursor1.pos-1
   elseif State.cursor1.line > 1 then
     State.cursor1.line = State.cursor1.line-1
-    State.cursor1.pos = utf8.len(State.lines[State.cursor1.line]) + 1
+    State.cursor1.pos = utf8.len(State.lines[State.cursor1.line].data) + 1
   end
   if Text.lt1(State.cursor1, State.screen_top1) then
     local top2 = Text.to2(State, State.screen_top1)
@@ -569,7 +569,7 @@ function Text.right(State)
 end
 
 function Text.right_without_scroll(State)
-  if State.cursor1.pos <= utf8.len(State.lines[State.cursor1.line]) then
+  if State.cursor1.pos <= utf8.len(State.lines[State.cursor1.line].data) then
     State.cursor1.pos = State.cursor1.pos+1
   elseif State.cursor1.line <= #State.lines-1 then
     State.cursor1.line = State.cursor1.line+1
@@ -647,8 +647,8 @@ function Text.to_pos_on_line(State, line_index, mx, my)
   local start_screen_line_index = Text.screen_line_index(line_cache.screen_line_starting_pos, line_cache.startpos)
   for screen_line_index = start_screen_line_index,#line_cache.screen_line_starting_pos do
     local screen_line_starting_pos = line_cache.screen_line_starting_pos[screen_line_index]
-    local screen_line_starting_byte_offset = Text.offset(line, screen_line_starting_pos)
---?     print('iter', y, screen_line_index, screen_line_starting_pos, string.sub(line, screen_line_starting_byte_offset))
+    local screen_line_starting_byte_offset = Text.offset(line.data, screen_line_starting_pos)
+--?     print('iter', y, screen_line_index, screen_line_starting_pos, string.sub(line.data, screen_line_starting_byte_offset))
     local nexty = y + State.line_height
     if my < nexty then
       -- On all wrapped screen lines but the final one, clicks past end of
@@ -658,7 +658,7 @@ function Text.to_pos_on_line(State, line_index, mx, my)
 --?         print('past end of non-final line; return')
         return line_cache.screen_line_starting_pos[screen_line_index+1]-1
       end
-      local s = string.sub(line, screen_line_starting_byte_offset)
+      local s = string.sub(line.data, screen_line_starting_byte_offset)
 --?       print('return', mx, Text.nearest_cursor_pos(s, mx, State.left), '=>', screen_line_starting_pos + Text.nearest_cursor_pos(s, mx, State.left) - 1)
       return screen_line_starting_pos + Text.nearest_cursor_pos(s, mx, State.left) - 1
     end
@@ -671,14 +671,14 @@ function Text.screen_line_width(State, line_index, i)
   local line = State.lines[line_index]
   local line_cache = State.line_cache[line_index]
   local start_pos = line_cache.screen_line_starting_pos[i]
-  local start_offset = Text.offset(line, start_pos)
+  local start_offset = Text.offset(line.data, start_pos)
   local screen_line
   if i < #line_cache.screen_line_starting_pos then
     local past_end_pos = line_cache.screen_line_starting_pos[i+1]
-    local past_end_offset = Text.offset(line, past_end_pos)
-    screen_line = string.sub(line, start_offset, past_end_offset-1)
+    local past_end_offset = Text.offset(line.data, past_end_pos)
+    screen_line = string.sub(line.data, start_offset, past_end_offset-1)
   else
-    screen_line = string.sub(line, start_pos)
+    screen_line = string.sub(line.data, start_pos)
   end
   local screen_line_text = App.newText(love.graphics.getFont(), screen_line)
   return App.width(screen_line_text)

@@ -601,7 +601,7 @@ function test_cursor_movement_without_shift_resets_selection()
   edit.run_after_keychord(Editor_state, 'right')
   -- no change to data, selection is reset
   check_nil(Editor_state.selection1.line, 'F - test_cursor_movement_without_shift_resets_selection')
-  check_eq(Editor_state.lines[1], 'abc', 'F - test_cursor_movement_without_shift_resets_selection/data')
+  check_eq(Editor_state.lines[1].data, 'abc', 'F - test_cursor_movement_without_shift_resets_selection/data')
 end
 
 function test_edit_deletes_selection()
@@ -619,7 +619,7 @@ function test_edit_deletes_selection()
   -- press a key
   edit.run_after_textinput(Editor_state, 'x')
   -- selected text is deleted and replaced with the key
-  check_eq(Editor_state.lines[1], 'xbc', 'F - test_edit_deletes_selection')
+  check_eq(Editor_state.lines[1].data, 'xbc', 'F - test_edit_deletes_selection')
 end
 
 function test_edit_with_shift_key_deletes_selection()
@@ -642,7 +642,7 @@ function test_edit_with_shift_key_deletes_selection()
   App.fake_key_release('lshift')
   -- selected text is deleted and replaced with the key
   check_nil(Editor_state.selection1.line, 'F - test_edit_with_shift_key_deletes_selection')
-  check_eq(Editor_state.lines[1], 'Dbc', 'F - test_edit_with_shift_key_deletes_selection/data')
+  check_eq(Editor_state.lines[1].data, 'Dbc', 'F - test_edit_with_shift_key_deletes_selection/data')
 end
 
 function test_copy_does_not_reset_selection()
@@ -680,7 +680,7 @@ function test_cut()
   edit.run_after_keychord(Editor_state, 'C-x')
   check_eq(App.clipboard, 'a', 'F - test_cut/clipboard')
   -- selected text is deleted
-  check_eq(Editor_state.lines[1], 'bc', 'F - test_cut/data')
+  check_eq(Editor_state.lines[1].data, 'bc', 'F - test_cut/data')
 end
 
 function test_paste_replaces_selection()
@@ -701,7 +701,7 @@ function test_paste_replaces_selection()
   edit.run_after_keychord(Editor_state, 'C-v')
   -- selection is reset since shift key is not pressed
   -- selection includes the newline, so it's also deleted
-  check_eq(Editor_state.lines[1], 'xyzdef', 'F - test_paste_replaces_selection')
+  check_eq(Editor_state.lines[1].data, 'xyzdef', 'F - test_paste_replaces_selection')
 end
 
 function test_deleting_selection_may_scroll()
@@ -727,7 +727,7 @@ function test_deleting_selection_may_scroll()
   edit.run_after_keychord(Editor_state, 'backspace')
   -- page scrolls up
   check_eq(Editor_state.screen_top1.line, 1, 'F - test_deleting_selection_may_scroll')
-  check_eq(Editor_state.lines[1], 'ahi', 'F - test_deleting_selection_may_scroll/data')
+  check_eq(Editor_state.lines[1].data, 'ahi', 'F - test_deleting_selection_may_scroll/data')
 end
 
 function test_edit_wrapping_text()
@@ -793,8 +793,8 @@ function test_insert_newline_at_start_of_line()
   edit.run_after_keychord(Editor_state, 'return')
   check_eq(Editor_state.cursor1.line, 2, 'F - test_insert_newline_at_start_of_line/cursor:line')
   check_eq(Editor_state.cursor1.pos, 1, 'F - test_insert_newline_at_start_of_line/cursor:pos')
-  check_eq(Editor_state.lines[1], '', 'F - test_insert_newline_at_start_of_line/data:1')
-  check_eq(Editor_state.lines[2], 'abc', 'F - test_insert_newline_at_start_of_line/data:2')
+  check_eq(Editor_state.lines[1].data, '', 'F - test_insert_newline_at_start_of_line/data:1')
+  check_eq(Editor_state.lines[2].data, 'abc', 'F - test_insert_newline_at_start_of_line/data:2')
 end
 
 function test_insert_from_clipboard()
@@ -1758,7 +1758,7 @@ function test_backspace_past_line_boundary()
   Editor_state.cursor1 = {line=2, pos=1}
   -- backspace joins with previous line
   edit.run_after_keychord(Editor_state, 'backspace')
-  check_eq(Editor_state.lines[1], 'abcdef', "F - test_backspace_past_line_boundary")
+  check_eq(Editor_state.lines[1].data, 'abcdef', "F - test_backspace_past_line_boundary")
 end
 
 -- some tests for operating over selections created using Shift- chords
@@ -1775,7 +1775,7 @@ function test_backspace_over_selection()
   Editor_state.selection1 = {line=1, pos=2}
   -- backspace deletes the selected character, even though it's after the cursor
   edit.run_after_keychord(Editor_state, 'backspace')
-  check_eq(Editor_state.lines[1], 'bc', "F - test_backspace_over_selection/data")
+  check_eq(Editor_state.lines[1].data, 'bc', "F - test_backspace_over_selection/data")
   -- cursor (remains) at start of selection
   check_eq(Editor_state.cursor1.line, 1, "F - test_backspace_over_selection/cursor:line")
   check_eq(Editor_state.cursor1.pos, 1, "F - test_backspace_over_selection/cursor:pos")
@@ -1794,7 +1794,7 @@ function test_backspace_over_selection_reverse()
   Editor_state.selection1 = {line=1, pos=1}
   -- backspace deletes the selected character
   edit.run_after_keychord(Editor_state, 'backspace')
-  check_eq(Editor_state.lines[1], 'bc', "F - test_backspace_over_selection_reverse/data")
+  check_eq(Editor_state.lines[1].data, 'bc', "F - test_backspace_over_selection_reverse/data")
   -- cursor moves to start of selection
   check_eq(Editor_state.cursor1.line, 1, "F - test_backspace_over_selection_reverse/cursor:line")
   check_eq(Editor_state.cursor1.pos, 1, "F - test_backspace_over_selection_reverse/cursor:pos")
@@ -1813,8 +1813,8 @@ function test_backspace_over_multiple_lines()
   Editor_state.selection1 = {line=4, pos=2}
   -- backspace deletes the region and joins the remaining portions of lines on either side
   edit.run_after_keychord(Editor_state, 'backspace')
-  check_eq(Editor_state.lines[1], 'akl', "F - test_backspace_over_multiple_lines/data:1")
-  check_eq(Editor_state.lines[2], 'mno', "F - test_backspace_over_multiple_lines/data:2")
+  check_eq(Editor_state.lines[1].data, 'akl', "F - test_backspace_over_multiple_lines/data:1")
+  check_eq(Editor_state.lines[2].data, 'mno', "F - test_backspace_over_multiple_lines/data:2")
   -- cursor remains at start of selection
   check_eq(Editor_state.cursor1.line, 1, "F - test_backspace_over_multiple_lines/cursor:line")
   check_eq(Editor_state.cursor1.pos, 2, "F - test_backspace_over_multiple_lines/cursor:pos")
@@ -1833,8 +1833,8 @@ function test_backspace_to_end_of_line()
   Editor_state.selection1 = {line=1, pos=4}
   -- backspace deletes rest of line without joining to any other line
   edit.run_after_keychord(Editor_state, 'backspace')
-  check_eq(Editor_state.lines[1], 'a', "F - test_backspace_to_start_of_line/data:1")
-  check_eq(Editor_state.lines[2], 'def', "F - test_backspace_to_start_of_line/data:2")
+  check_eq(Editor_state.lines[1].data, 'a', "F - test_backspace_to_start_of_line/data:1")
+  check_eq(Editor_state.lines[2].data, 'def', "F - test_backspace_to_start_of_line/data:2")
   -- cursor remains at start of selection
   check_eq(Editor_state.cursor1.line, 1, "F - test_backspace_to_start_of_line/cursor:line")
   check_eq(Editor_state.cursor1.pos, 2, "F - test_backspace_to_start_of_line/cursor:pos")
@@ -1853,8 +1853,8 @@ function test_backspace_to_start_of_line()
   Editor_state.selection1 = {line=2, pos=3}
   -- backspace deletes beginning of line without joining to any other line
   edit.run_after_keychord(Editor_state, 'backspace')
-  check_eq(Editor_state.lines[1], 'abc', "F - test_backspace_to_start_of_line/data:1")
-  check_eq(Editor_state.lines[2], 'f', "F - test_backspace_to_start_of_line/data:2")
+  check_eq(Editor_state.lines[1].data, 'abc', "F - test_backspace_to_start_of_line/data:1")
+  check_eq(Editor_state.lines[2].data, 'f', "F - test_backspace_to_start_of_line/data:2")
   -- cursor remains at start of selection
   check_eq(Editor_state.cursor1.line, 2, "F - test_backspace_to_start_of_line/cursor:line")
   check_eq(Editor_state.cursor1.pos, 1, "F - test_backspace_to_start_of_line/cursor:pos")
@@ -1950,7 +1950,7 @@ function test_undo_restores_selection()
   edit.draw(Editor_state)
   -- delete selected text
   edit.run_after_textinput(Editor_state, 'x')
-  check_eq(Editor_state.lines[1], 'xbc', 'F - test_undo_restores_selection/baseline')
+  check_eq(Editor_state.lines[1].data, 'xbc', 'F - test_undo_restores_selection/baseline')
   check_nil(Editor_state.selection1.line, 'F - test_undo_restores_selection/baseline:selection')
   -- undo
   edit.run_after_keychord(Editor_state, 'C-z')
