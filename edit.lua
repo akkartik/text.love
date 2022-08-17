@@ -86,7 +86,8 @@ function edit.draw(State)
     print(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos)
     assert(false)
   end
-  State.cursor_y = -1
+  State.cursor_x = nil
+  State.cursor_y = nil
   local y = State.top
 --?   print('== draw')
   for line_index = State.screen_top1.line,#State.lines do
@@ -102,9 +103,6 @@ function edit.draw(State)
     y, State.screen_bottom1.pos = Text.draw(State, line_index, y, startpos)
     y = y + State.line_height
 --?     print('=> y', y)
-  end
-  if State.cursor_y == -1 then
-    State.cursor_y = App.screen.height
   end
 --?   print('screen bottom: '..tostring(State.screen_bottom1.pos)..' in '..tostring(State.lines[State.screen_bottom1.line].data))
   if State.search_term then
@@ -301,7 +299,7 @@ function edit.keychord_pressed(State, chord, key)
         Text.insert_at_cursor(State, c)
       end
     end
-    if Text.cursor_past_screen_bottom(State) then
+    if Text.cursor_out_of_screen(State) then
       Text.snap_cursor_to_bottom_of_screen(State, State.left, State.right)
     end
     schedule_save(State)
