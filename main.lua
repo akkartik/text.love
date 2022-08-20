@@ -124,6 +124,7 @@ function App.filedropped(file)
   file:open('r')
   Editor_state.lines = load_from_file(file)
   file:close()
+  Text.redraw_all(Editor_state)
   love.window.setTitle('text.love - '..Editor_state.filename)
 end
 
