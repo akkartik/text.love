@@ -75,6 +75,9 @@ Updates to it can be downloaded from the following mirrors:
 
 Further forks are encouraged. If you show me your fork, I'll link to it here.
 
+* https://codeberg.org/akkartik/view.love -- a stripped down version without
+  support for modifying files; useful starting point for some forks.
+
 ## Feedback
 
 [Most appreciated.](http://akkartik.name/contact)
