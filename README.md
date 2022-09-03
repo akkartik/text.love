@@ -30,6 +30,7 @@ While editing text:
 * `ctrl+z` to undo, `ctrl+y` to redo
 * `ctrl+=` to zoom in, `ctrl+-` to zoom out, `ctrl+0` to reset zoom
 * `alt+right`/`alt+left` to jump to the next/previous word, respectively
+* `ctrl+e` to modify the sources
 
 Exclusively tested so far with a US keyboard layout. If
 you use a different layout, please let me know if things worked, or if you
@@ -59,6 +60,10 @@ found anything amiss: http://akkartik.name/contact
 
 * No scrollbars yet. That stuff is hard.
 
+* There are some temporary limitations when editing sources:
+    - no line drawings
+    - no selecting text
+
 ## Mirrors and Forks
 
 This repo is a fork of lines.love at [http://akkartik.name/lines.html](http://akkartik.name/lines.html).
@@ -77,6 +82,8 @@ Further forks are encouraged. If you show me your fork, I'll link to it here.
 
 * https://codeberg.org/akkartik/view.love -- a stripped down version without
   support for modifying files; useful starting point for some forks.
+* https://codeberg.org/akkartik/pong.love -- a fairly minimal example app that
+  can edit and debug its own source code.
 
 ## Feedback
 
