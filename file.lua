@@ -37,7 +37,8 @@ function save_to_disk(State)
     error('failed to write to "'..State.filename..'"')
   end
   for _,line in ipairs(State.lines) do
-    outfile:write(line.data, '\n')
+    outfile:write(line.data)
+    outfile:write('\n')
   end
   outfile:close()
 end

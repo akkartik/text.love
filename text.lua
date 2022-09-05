@@ -113,7 +113,7 @@ function Text.compute_fragments(State, line_index)
   for frag in line.data:gmatch('%S*%s*') do
     local frag_text = App.newText(love.graphics.getFont(), frag)
     local frag_width = App.width(frag_text)
---?     print('x: '..tostring(x)..'; '..tostring(State.right-x)..'px to go')
+--?     print('x: '..tostring(x)..'; frag_width: '..tostring(frag_width)..'; '..tostring(State.right-x)..'px to go')
     while x + frag_width > State.right do
 --?       print(('checking whether to split fragment ^%s$ of width %d when rendering from %d'):format(frag, frag_width, x))
       if (x-State.left) < 0.8 * (State.right-State.left) then
@@ -356,8 +356,7 @@ function Text.insert_return(State)
   table.insert(State.line_cache, State.cursor1.line+1, {})
   State.lines[State.cursor1.line].data = string.sub(State.lines[State.cursor1.line].data, 1, byte_offset-1)
   Text.clear_screen_line_cache(State, State.cursor1.line)
-  State.cursor1.line = State.cursor1.line+1
-  State.cursor1.pos = 1
+  State.cursor1 = {line=State.cursor1.line+1, pos=1}
 end
 
 function Text.pageup(State)
@@ -373,8 +372,7 @@ function Text.pageup(State)
     top2 = Text.previous_screen_line(State, top2)
   end
   State.screen_top1 = Text.to1(State, top2)
-  State.cursor1.line = State.screen_top1.line
-  State.cursor1.pos = State.screen_top1.pos
+  State.cursor1 = {line=State.screen_top1.line, pos=State.screen_top1.pos}
   Text.move_cursor_down_to_next_text_line_while_scrolling_again_if_necessary(State)
 --?   print(State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos)
 --?   print('pageup end')
@@ -393,12 +391,10 @@ function Text.pagedown(State)
   if Text.lt1(State.screen_top1, new_top1) then
     State.screen_top1 = new_top1
   else
-    State.screen_top1.line = State.screen_bottom1.line
-    State.screen_top1.pos = State.screen_bottom1.pos
+    State.screen_top1 = {line=State.screen_bottom1.line, pos=State.screen_bottom1.pos}
   end
 --?   print('setting top to', State.screen_top1.line, State.screen_top1.pos)
-  State.cursor1.line = State.screen_top1.line
-  State.cursor1.pos = State.screen_top1.pos
+  State.cursor1 = {line=State.screen_top1.line, pos=State.screen_top1.pos}
   Text.move_cursor_down_to_next_text_line_while_scrolling_again_if_necessary(State)
 --?   print('top now', State.screen_top1.line)
   Text.redraw_all(State)  -- if we're scrolling, reclaim all fragments to avoid memory leaks
@@ -463,6 +459,7 @@ function Text.down(State)
     local scroll_down = Text.le1(State.screen_bottom1, State.cursor1)
 --?     print('cursor is NOT at final screen line of its line')
     local screen_line_starting_pos, screen_line_index = Text.pos_at_start_of_screen_line(State, State.cursor1)
+    Text.populate_screen_line_starting_pos(State, State.cursor1.line)
     local new_screen_line_starting_pos = State.line_cache[State.cursor1.line].screen_line_starting_pos[screen_line_index+1]
 --?     print('switching pos of screen line at cursor from '..tostring(screen_line_starting_pos)..' to '..tostring(new_screen_line_starting_pos))
     local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line].data, new_screen_line_starting_pos)
@@ -608,8 +605,12 @@ end
 
 -- should never modify State.cursor1
 function Text.snap_cursor_to_bottom_of_screen(State)
+--?   print('to2:', State.cursor1.line, State.cursor1.pos)
   local top2 = Text.to2(State, State.cursor1)
+--?   print('to2: =>', top2.line, top2.screen_line, top2.screen_pos)
+  -- slide to start of screen line
   top2.screen_pos = 1  -- start of screen line
+--?   print('snap', State.screen_top1.line, State.screen_top1.pos, State.screen_top1.posB, State.cursor1.line, State.cursor1.pos, State.screen_bottom1.line, State.screen_bottom1.pos)
 --?   print('cursor pos '..tostring(State.cursor1.pos)..' is on the #'..tostring(top2.screen_line)..' screen line down')
   local y = App.screen.height - State.line_height
   -- duplicate some logic from love.draw
@@ -626,6 +627,7 @@ function Text.snap_cursor_to_bottom_of_screen(State)
 --?   print('top2 finally:', top2.line, top2.screen_line, top2.screen_pos)
   State.screen_top1 = Text.to1(State, top2)
 --?   print('top1 finally:', State.screen_top1.line, State.screen_top1.pos)
+--?   print('snap =>', State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos, State.screen_bottom1.line, State.screen_bottom1.pos)
   Text.redraw_all(State)  -- if we're scrolling, reclaim all fragments to avoid memory leaks
 end
 
@@ -782,7 +784,7 @@ function Text.x(s, pos)
 end
 
 function Text.to2(State, loc1)
-  local result = {line=loc1.line, screen_line=1}
+  local result = {line=loc1.line}
   local line_cache = State.line_cache[loc1.line]
   Text.populate_screen_line_starting_pos(State, loc1.line)
   for i=#line_cache.screen_line_starting_pos,1,-1 do
