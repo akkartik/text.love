@@ -58,3 +58,20 @@ function load_array(a)
   end
   return result
 end
+
+function is_absolute_path(path)
+  local os_path_separator = package.config:sub(1,1)
+  if os_path_separator == '/' then
+    -- POSIX systems permit backslashes in filenames
+    return path:sub(1,1) == '/'
+  elseif os_path_separator == '\\' then
+    local f = path:sub(1,1)
+    return f == '/' or f == '\\'
+  else
+    error('What OS is this? LÖVE reports that the path separator is "'..os_path_separator..'"')
+  end
+end
+
+function is_relative_path(path)
+  return not is_absolute_path(path)
+end
