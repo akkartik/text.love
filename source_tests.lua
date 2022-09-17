@@ -7,7 +7,7 @@ function test_resize_window()
   check_eq(App.screen.width, 300, 'F - test_resize_window/baseline/width')
   check_eq(App.screen.height, 300, 'F - test_resize_window/baseline/height')
   check_eq(Editor_state.left, Test_margin_left, 'F - test_resize_window/baseline/left_margin')
-  check_eq(Editor_state.right, 300 - Test_margin_right, 'F - test_resize_window/baseline/left_margin')
+  check_eq(Editor_state.right, 300 - Test_margin_right, 'F - test_resize_window/baseline/right_margin')
   App.resize(200, 400)
   -- ugly; resize switches to real, non-test margins
   check_eq(App.screen.width, 200, 'F - test_resize_window/width')
@@ -16,6 +16,84 @@ function test_resize_window()
   check_eq(Editor_state.right, 200-Margin_right, 'F - test_resize_window/right_margin')
   check_eq(Editor_state.width, 200-Margin_left-Margin_right, 'F - test_resize_window/drawing_width')
   -- TODO: how to make assertions about when App.update got past the early exit?
+end
+
+function test_show_log_browser_side()
+  io.write('\ntest_show_log_browser_side')
+  App.screen.init{width=300, height=300}
+  Display_width = App.screen.width
+  Current_app = 'source'
+  Editor_state = edit.initialize_test_state()
+  Editor_state.filename = 'foo'
+  Text.redraw_all(Editor_state)
+  Log_browser_state = edit.initialize_test_state()
+  Text.redraw_all(Log_browser_state)
+  log_browser.parse(Log_browser_state)
+  check(not Show_log_browser_side, 'F - test_show_log_browser_side/baseline')
+  -- pressing ctrl+l shows log-browser side
+  App.wait_fake_time(0.1)
+  App.run_after_keychord('C-l')
+  check(Show_log_browser_side, 'F - test_show_log_browser_side')
+end
+
+function test_show_log_browser_side_doubles_window_width_if_possible()
+  io.write('\ntest_show_log_browser_side_doubles_window_width_if_possible')
+  -- initialize screen dimensions to half width
+  App.screen.init{width=300, height=300}
+  Display_width = App.screen.width*2
+  -- initialize source app with left side occupying entire window (half the display)
+  Current_app = 'source'
+  Editor_state = edit.initialize_test_state()
+  Editor_state.filename = 'foo'
+  Editor_state.left = Margin_left
+  Editor_state.right = App.screen.width - Margin_right
+  local old_editor_right = Editor_state.right
+  Text.redraw_all(Editor_state)
+  Log_browser_state = edit.initialize_test_state()
+  -- log browser has some arbitrary margins
+  Log_browser_state.left = 200 + Margin_left
+  Log_browser_state.right = 400
+  Text.redraw_all(Log_browser_state)
+  log_browser.parse(Log_browser_state)
+  -- display log browser
+  App.wait_fake_time(0.1)
+  App.run_after_keychord('C-l')
+  -- window width is doubled
+  check_eq(App.screen.width, 600, 'F - test_show_log_browser_side_doubles_window_width_if_possible/display:width')
+  -- left side margins are unchanged
+  check_eq(Editor_state.left, Margin_left, 'F - test_show_log_browser_side_doubles_window_width_if_possible/edit:left')
+  check_eq(Editor_state.right, old_editor_right, 'F - test_show_log_browser_side_doubles_window_width_if_possible/edit:right')
+  -- log browser margins are adjusted
+  check_eq(Log_browser_state.left, App.screen.width/2 + Margin_left, 'F - test_show_log_browser_side_doubles_window_width_if_possible/log:left')
+  check_eq(Log_browser_state.right, App.screen.width - Margin_right, 'F - test_show_log_browser_side_doubles_window_width_if_possible/log:right')
+end
+
+function test_show_log_browser_side_resizes_both_sides_if_cannot_double_window_width()
+  io.write('\ntest_show_log_browser_side_resizes_both_sides_if_cannot_double_window_width')
+  -- initialize screen dimensions and indicate that it is maximized
+  App.screen.init{width=300, height=300}
+  Display_width = 300
+  -- initialize source app with left side occupying more than half the display
+  Current_app = 'source'
+  Editor_state = edit.initialize_test_state()
+  Editor_state.filename = 'foo'
+  Editor_state.left = Margin_left
+  Editor_state.right = 200
+  Text.redraw_all(Editor_state)
+  Log_browser_state = edit.initialize_test_state()
+  -- log browser has some arbitrary margins
+  Log_browser_state.left = 200 + Margin_left
+  Log_browser_state.right = 400
+  Text.redraw_all(Log_browser_state)
+  log_browser.parse(Log_browser_state)
+  -- display log browser
+  App.wait_fake_time(0.1)
+  App.run_after_keychord('C-l')
+  -- margins are now adjusted
+  check_eq(Editor_state.left, Margin_left, 'F - test_show_log_browser_side_resizes_both_sides_if_cannot_double_window_width/edit:left')
+  check_eq(Editor_state.right, App.screen.width/2 - Margin_right, 'F - test_show_log_browser_side_resizes_both_sides_if_cannot_double_window_width/edit:right')
+  check_eq(Log_browser_state.left, App.screen.width/2 + Margin_left, 'F - test_show_log_browser_side_resizes_both_sides_if_cannot_double_window_width/log:left')
+  check_eq(Log_browser_state.right, App.screen.width - Margin_right, 'F - test_show_log_browser_side_resizes_both_sides_if_cannot_double_window_width/log:right')
 end
 
 function test_drop_file()
