@@ -1,4 +1,5 @@
 source = {}
+log_render = {}
 
 Editor_state = {}
 
@@ -10,7 +11,7 @@ function source.initialize_globals()
   Focus = 'edit'
   Show_file_navigator = false
   File_navigation = {
-    candidates = {
+    all_candidates = {
       'run',
       'run_tests',
       'log',
@@ -43,7 +44,9 @@ function source.initialize_globals()
       'json',
     },
     index = 1,
+    filter = '',
   }
+  File_navigation.candidates = File_navigation.all_candidates  -- modified with filter
 
   Menu_status_bar_height = 5 + --[[line height in tests]] 15 + 5
 
@@ -56,6 +59,7 @@ end
 
 -- called only for real run
 function source.initialize()
+  log_new('source')
   love.keyboard.setTextInput(true)  -- bring up keyboard on touch screen
   love.keyboard.setKeyRepeat(true)
 
@@ -219,8 +223,7 @@ function source.switch_to_file(filename)
 end
 
 function source.draw()
-  source.draw_menu_bar()
-  edit.draw(Editor_state)
+  edit.draw(Editor_state, --[[hide cursor?]] Show_file_navigator)
   if Show_log_browser_side then
     -- divider
     App.color(Divider_color)
@@ -228,6 +231,7 @@ function source.draw()
     --
     log_browser.draw(Log_browser_state)
   end
+  source.draw_menu_bar()
 end
 
 function source.update(dt)
@@ -304,6 +308,10 @@ end
 
 function source.textinput(t)
   Cursor_time = 0  -- ensure cursor is visible immediately after it moves
+  if Show_file_navigator then
+    textinput_on_file_navigator(t)
+    return
+  end
   if Focus == 'edit' then
     return edit.textinput(Editor_state, t)
   else
@@ -341,7 +349,6 @@ function source.keychord_pressed(chord, key)
   end
   if chord == 'C-g' then
     Show_file_navigator = true
-    File_navigation.index = 1
     return
   end
   if Focus == 'edit' then
