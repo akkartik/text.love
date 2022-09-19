@@ -64,10 +64,6 @@ function source.draw_file_navigator()
   love.graphics.rectangle('fill', 0,Menu_status_bar_height, App.screen.width, File_navigation.num_lines * Editor_state.line_height + --[[highlight padding]] 2)
   local x,y = 5, Menu_status_bar_height
   for i,filename in ipairs(File_navigation.candidates) do
-    if filename == 'source' then
-      App.color(Menu_border_color)
-      love.graphics.line(Menu_cursor-10,2, Menu_cursor-10,Menu_status_bar_height-2)
-    end
     x,y = add_file_to_menu(x,y, filename, i == File_navigation.index)
     if Menu_cursor >= App.screen.width - 5 then
       break
@@ -124,9 +120,7 @@ function add_file_to_menu(x,y, s, cursor_highlight)
   end
   button(Editor_state, 'menu', {x=x-5, y=y-2, w=width+5*2, h=Editor_state.line_height+2*2, color=colortable(color),
     onpress1 = function()
-      local candidate = guess_source(s..'.lua')
-      source.switch_to_file(candidate)
-      Show_file_navigator = false
+      navigate_to_file(s)
     end
   })
   App.color(Menu_command_color)
@@ -135,21 +129,34 @@ function add_file_to_menu(x,y, s, cursor_highlight)
   return x,y
 end
 
+function navigate_to_file(s)
+  move_candidate_to_front(s)
+  local candidate = guess_source(s..'.lua')
+  source.switch_to_file(candidate)
+  reset_file_navigator()
+end
+
+function move_candidate_to_front(s)
+  local index = array.find(File_navigation.all_candidates, s)
+  assert(index)
+  table.remove(File_navigation.all_candidates, index)
+  table.insert(File_navigation.all_candidates, 1, s)
+end
+
+function reset_file_navigator()
+  Show_file_navigator = false
+  File_navigation.index = 1
+  File_navigation.filter = ''
+  File_navigation.candidates = File_navigation.all_candidates
+end
+
 function keychord_pressed_on_file_navigator(chord, key)
   log(2, 'file navigator: '..chord)
   log(2, {name='file_navigator_state', files=File_navigation.candidates, index=File_navigation.index})
   if chord == 'escape' then
-    Show_file_navigator = false
-    File_navigation.index = 1
-    File_navigation.filter = ''
-    File_navigation.candidates = File_navigation.all_candidates
+    reset_file_navigator()
   elseif chord == 'return' then
-    local candidate = guess_source(File_navigation.candidates[File_navigation.index]..'.lua')
-    source.switch_to_file(candidate)
-    Show_file_navigator = false
-    File_navigation.index = 1
-    File_navigation.filter = ''
-    File_navigation.candidates = File_navigation.all_candidates
+    navigate_to_file(File_navigation.candidates[File_navigation.index])
   elseif chord == 'backspace' then
     local len = utf8.len(File_navigation.filter)
     local byte_offset = Text.offset(File_navigation.filter, len)
