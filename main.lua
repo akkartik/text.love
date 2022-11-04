@@ -79,8 +79,9 @@ function App.initialize_globals()
   end
 
   -- for hysteresis in a few places
-  Last_focus_time = App.getTime()  -- https://love2d.org/forums/viewtopic.php?p=249700
-  Last_resize_time = App.getTime()
+  Current_time = 0
+  Last_focus_time = 0  -- https://love2d.org/forums/viewtopic.php?p=249700
+  Last_resize_time = 0
 end
 
 function App.initialize(arg)
@@ -101,7 +102,7 @@ function App.resize(w,h)
   else
     assert(false, 'unknown app "'..Current_app..'"')
   end
-  Last_resize_time = App.getTime()
+  Last_resize_time = Current_time
 end
 
 function App.filedropped(file)
@@ -116,7 +117,7 @@ end
 
 function App.focus(in_focus)
   if in_focus then
-    Last_focus_time = App.getTime()
+    Last_focus_time = Current_time
   end
   if Current_app == 'run' then
     if run.focus then run.focus(in_focus) end
@@ -138,8 +139,9 @@ function App.draw()
 end
 
 function App.update(dt)
+  Current_time = Current_time + dt
   -- some hysteresis while resizing
-  if App.getTime() < Last_resize_time + 0.1 then
+  if Current_time < Last_resize_time + 0.1 then
     return
   end
   --
@@ -154,7 +156,7 @@ end
 
 function App.keychord_pressed(chord, key)
   -- ignore events for some time after window in focus (mostly alt-tab)
-  if App.getTime() < Last_focus_time + 0.01 then
+  if Current_time < Last_focus_time + 0.01 then
     return
   end
   --
@@ -192,7 +194,7 @@ end
 
 function App.textinput(t)
   -- ignore events for some time after window in focus (mostly alt-tab)
-  if App.getTime() < Last_focus_time + 0.01 then
+  if Current_time < Last_focus_time + 0.01 then
     return
   end
   --
@@ -207,7 +209,7 @@ end
 
 function App.keyreleased(chord, key)
   -- ignore events for some time after window in focus (mostly alt-tab)
-  if App.getTime() < Last_focus_time + 0.01 then
+  if Current_time < Last_focus_time + 0.01 then
     return
   end
   --

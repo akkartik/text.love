@@ -106,7 +106,7 @@ function edit.draw(State)
 end
 
 function edit.update(State, dt)
-  if State.next_save and State.next_save < App.getTime() then
+  if State.next_save and State.next_save < Current_time then
     save_to_disk(State)
     State.next_save = nil
   end
@@ -114,7 +114,7 @@ end
 
 function schedule_save(State)
   if State.next_save == nil then
-    State.next_save = App.getTime() + 3  -- short enough that you're likely to still remember what you did
+    State.next_save = Current_time + 3  -- short enough that you're likely to still remember what you did
   end
 end
 
