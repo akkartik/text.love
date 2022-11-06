@@ -75,7 +75,6 @@ function edit.initialize_state(top, left, right, font_height, line_height)  -- c
 end  -- App.initialize_state
 
 function edit.draw(State)
-  State.button_handlers = {}
   App.color(Text_color)
   assert(#State.lines == #State.line_cache)
   if not Text.le1(State.screen_top1, State.cursor1) then
@@ -128,11 +127,6 @@ end
 function edit.mouse_pressed(State, x,y, mouse_button)
   if State.search_term then return end
 --?   print('press', State.selection1.line, State.selection1.pos)
-  if mouse_press_consumed_by_any_button_handler(State, x,y, mouse_button) then
-    -- press on a button and it returned 'true' to short-circuit
-    return
-  end
-
   for line_index,line in ipairs(State.lines) do
     if Text.in_line(State, line_index, x,y) then
       -- delicate dance between cursor, selection and old cursor/selection
