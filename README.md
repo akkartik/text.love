@@ -83,6 +83,13 @@ Further forks are encouraged. If you show me your fork, I'll link to it here.
   support for modifying files; useful starting point for some forks.
 * https://codeberg.org/akkartik/pong.love -- a fairly minimal example app that
   can edit and debug its own source code.
+* https://codeberg.org/akkartik/template-live-editor.love -- a template for
+  building "free-wheeling" live programs (easy to fork, can be modified as
+  they run), with a text editor primitive.
+* https://codeberg.org/akkartik/luaML.love -- a free-wheeling 'browser' for a
+  Lua-based markup language built as a live program.
+* https://codeberg.org/akkartik/driver.love -- a programming environment for
+  modifying free-wheeling programs while they run.
 
 ## Feedback
 
