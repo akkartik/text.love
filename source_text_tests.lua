@@ -65,7 +65,7 @@ function test_insert_first_character()
   Editor_state.lines = load_array{}
   Text.redraw_all(Editor_state)
   edit.draw(Editor_state)
-  edit.run_after_textinput(Editor_state, 'a')
+  edit.run_after_text_input(Editor_state, 'a')
   local y = Editor_state.top
   App.screen.check(y, 'a', 'F - test_insert_first_character/screen:1')
 end
@@ -267,26 +267,27 @@ function test_move_past_end_of_word_on_next_line()
   check_eq(Editor_state.cursor1.pos, 4, 'F - test_move_past_end_of_word_on_next_line/pos')
 end
 
-function test_click_with_mouse()
-  io.write('\ntest_click_with_mouse')
-  -- display two lines with cursor on one of them
-  App.screen.init{width=50, height=80}
+function test_click_moves_cursor()
+  io.write('\ntest_click_moves_cursor')
+  App.screen.init{width=50, height=60}
   Editor_state = edit.initialize_test_state()
-  Editor_state.lines = load_array{'abc', 'def'}
+  Editor_state.lines = load_array{'abc', 'def', 'xyz'}
   Text.redraw_all(Editor_state)
-  Editor_state.cursor1 = {line=2, pos=1}
+  Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
   Editor_state.screen_bottom1 = {}
-  -- click on the other line
-  edit.draw(Editor_state)
-  edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
-  -- cursor moves
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_with_mouse/cursor:line')
-  check_nil(Editor_state.selection1.line, 'F - test_click_with_mouse/selection is empty to avoid perturbing future edits')
+  Editor_state.selection1 = {}
+  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
+  edit.run_after_mouse_release(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
+  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_moves_cursor/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_moves_cursor/cursor:pos')
+  -- selection is empty to avoid perturbing future edits
+  check_nil(Editor_state.selection1.line, 'F - test_click_moves_cursor/selection:line')
+  check_nil(Editor_state.selection1.pos, 'F - test_click_moves_cursor/selection:pos')
 end
 
-function test_click_with_mouse_to_left_of_line()
-  io.write('\ntest_click_with_mouse_to_left_of_line')
+function test_click_to_left_of_line()
+  io.write('\ntest_click_to_left_of_line')
   -- display a line with the cursor in the middle
   App.screen.init{width=50, height=80}
   Editor_state = edit.initialize_test_state()
@@ -299,13 +300,13 @@ function test_click_with_mouse_to_left_of_line()
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left-4,Editor_state.top+5, 1)
   -- cursor moves to start of line
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_with_mouse_to_left_of_line/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 1, 'F - test_click_with_mouse_to_left_of_line/cursor:pos')
-  check_nil(Editor_state.selection1.line, 'F - test_click_with_mouse_to_left_of_line/selection is empty to avoid perturbing future edits')
+  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_to_left_of_line/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 1, 'F - test_click_to_left_of_line/cursor:pos')
+  check_nil(Editor_state.selection1.line, 'F - test_click_to_left_of_line/selection is empty to avoid perturbing future edits')
 end
 
-function test_click_with_mouse_takes_margins_into_account()
-  io.write('\ntest_click_with_mouse_takes_margins_into_account')
+function test_click_takes_margins_into_account()
+  io.write('\ntest_click_takes_margins_into_account')
   -- display two lines with cursor on one of them
   App.screen.init{width=100, height=80}
   Editor_state = edit.initialize_test_state()
@@ -319,13 +320,13 @@ function test_click_with_mouse_takes_margins_into_account()
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   -- cursor moves
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_with_mouse_takes_margins_into_account/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_with_mouse_takes_margins_into_account/cursor:pos')
-  check_nil(Editor_state.selection1.line, 'F - test_click_with_mouse_takes_margins_into_account/selection is empty to avoid perturbing future edits')
+  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_takes_margins_into_account/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_takes_margins_into_account/cursor:pos')
+  check_nil(Editor_state.selection1.line, 'F - test_click_takes_margins_into_account/selection is empty to avoid perturbing future edits')
 end
 
-function test_click_with_mouse_on_empty_line()
-  io.write('\ntest_click_with_mouse_on_empty_line')
+function test_click_on_empty_line()
+  io.write('\ntest_click_on_empty_line')
   -- display two lines with the first one empty
   App.screen.init{width=50, height=80}
   Editor_state = edit.initialize_test_state()
@@ -338,7 +339,7 @@ function test_click_with_mouse_on_empty_line()
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   -- cursor moves
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_with_mouse_on_empty_line/cursor')
+  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_on_empty_line/cursor')
 end
 
 function test_draw_text()
@@ -395,8 +396,8 @@ function test_draw_word_wrapping_text()
   App.screen.check(y, 'ghi', 'F - test_draw_word_wrapping_text/screen:3')
 end
 
-function test_click_with_mouse_on_wrapping_line()
-  io.write('\ntest_click_with_mouse_on_wrapping_line')
+function test_click_on_wrapping_line()
+  io.write('\ntest_click_on_wrapping_line')
   -- display two lines with cursor on one of them
   App.screen.init{width=50, height=80}
   Editor_state = edit.initialize_test_state()
@@ -409,13 +410,13 @@ function test_click_with_mouse_on_wrapping_line()
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   -- cursor moves
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_with_mouse_on_wrapping_line/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_with_mouse_on_wrapping_line/cursor:pos')
-  check_nil(Editor_state.selection1.line, 'F - test_click_with_mouse_on_wrapping_line/selection is empty to avoid perturbing future edits')
+  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_on_wrapping_line/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_on_wrapping_line/cursor:pos')
+  check_nil(Editor_state.selection1.line, 'F - test_click_on_wrapping_line/selection is empty to avoid perturbing future edits')
 end
 
-function test_click_with_mouse_on_wrapping_line_takes_margins_into_account()
-  io.write('\ntest_click_with_mouse_on_wrapping_line_takes_margins_into_account')
+function test_click_on_wrapping_line_takes_margins_into_account()
+  io.write('\ntest_click_on_wrapping_line_takes_margins_into_account')
   -- display two lines with cursor on one of them
   App.screen.init{width=100, height=80}
   Editor_state = edit.initialize_test_state()
@@ -429,9 +430,9 @@ function test_click_with_mouse_on_wrapping_line_takes_margins_into_account()
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   -- cursor moves
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_with_mouse_on_wrapping_line_takes_margins_into_account/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_with_mouse_on_wrapping_line_takes_margins_into_account/cursor:pos')
-  check_nil(Editor_state.selection1.line, 'F - test_click_with_mouse_on_wrapping_line_takes_margins_into_account/selection is empty to avoid perturbing future edits')
+  check_eq(Editor_state.cursor1.line, 1, 'F - test_click_on_wrapping_line_takes_margins_into_account/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 2, 'F - test_click_on_wrapping_line_takes_margins_into_account/cursor:pos')
+  check_nil(Editor_state.selection1.line, 'F - test_click_on_wrapping_line_takes_margins_into_account/selection is empty to avoid perturbing future edits')
 end
 
 function test_draw_text_wrapping_within_word()
@@ -605,8 +606,8 @@ function test_select_text()
   App.fake_key_press('lshift')
   edit.run_after_keychord(Editor_state, 'S-right')
   App.fake_key_release('lshift')
-  edit.key_released(Editor_state, 'lshift')
-  -- selection persists even after shift is released
+  edit.key_release(Editor_state, 'lshift')
+  -- selection persists even after shift is release
   check_eq(Editor_state.selection1.line, 1, 'F - test_select_text/selection:line')
   check_eq(Editor_state.selection1.pos, 1, 'F - test_select_text/selection:pos')
   check_eq(Editor_state.cursor1.line, 1, 'F - test_select_text/cursor:line')
@@ -645,7 +646,7 @@ function test_edit_deletes_selection()
   Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- press a key
-  edit.run_after_textinput(Editor_state, 'x')
+  edit.run_after_text_input(Editor_state, 'x')
   -- selected text is deleted and replaced with the key
   check_eq(Editor_state.lines[1].data, 'xbc', 'F - test_edit_deletes_selection')
 end
@@ -664,9 +665,9 @@ function test_edit_with_shift_key_deletes_selection()
   edit.draw(Editor_state)
   -- mimic precise keypresses for a capital letter
   App.fake_key_press('lshift')
-  edit.keychord_pressed(Editor_state, 'd', 'd')
-  edit.textinput(Editor_state, 'D')
-  edit.key_released(Editor_state, 'd')
+  edit.keychord_press(Editor_state, 'd', 'd')
+  edit.text_input(Editor_state, 'D')
+  edit.key_release(Editor_state, 'd')
   App.fake_key_release('lshift')
   -- selected text is deleted and replaced with the key
   check_nil(Editor_state.selection1.line, 'F - test_edit_with_shift_key_deletes_selection')
@@ -768,7 +769,7 @@ function test_edit_wrapping_text()
   Editor_state.screen_top1 = {line=1, pos=1}
   Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
-  edit.run_after_textinput(Editor_state, 'g')
+  edit.run_after_text_input(Editor_state, 'g')
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'F - test_edit_wrapping_text/screen:1')
   y = y + Editor_state.line_height
@@ -854,24 +855,6 @@ function test_insert_from_clipboard()
   App.screen.check(y, 'zbc', 'F - test_insert_from_clipboard/screen:2')
   y = y + Editor_state.line_height
   App.screen.check(y, 'def', 'F - test_insert_from_clipboard/screen:3')
-end
-
-function test_move_cursor_using_mouse()
-  io.write('\ntest_move_cursor_using_mouse')
-  App.screen.init{width=50, height=60}
-  Editor_state = edit.initialize_test_state()
-  Editor_state.lines = load_array{'abc', 'def', 'xyz'}
-  Text.redraw_all(Editor_state)
-  Editor_state.cursor1 = {line=1, pos=1}
-  Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
-  Editor_state.selection1 = {}
-  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
-  edit.run_after_mouse_release(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
-  check_eq(Editor_state.cursor1.line, 1, 'F - test_move_cursor_using_mouse/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 2, 'F - test_move_cursor_using_mouse/cursor:pos')
-  check_nil(Editor_state.selection1.line, 'F - test_move_cursor_using_mouse/selection:line')
-  check_nil(Editor_state.selection1.pos, 'F - test_move_cursor_using_mouse/selection:pos')
 end
 
 function test_select_text_using_mouse()
@@ -1189,8 +1172,8 @@ function test_down_arrow_scrolls_down_by_one_screen_line_after_splitting_within_
   App.screen.check(y, 'kl', 'F - test_down_arrow_scrolls_down_by_one_screen_line_after_splitting_within_word/screen:3')
 end
 
-function test_page_down_followed_by_down_arrow_does_not_scroll_screen_up()
-  io.write('\ntest_page_down_followed_by_down_arrow_does_not_scroll_screen_up')
+function test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up()
+  io.write('\ntest_pagedown_followed_by_down_arrow_does_not_scroll_screen_up')
   App.screen.init{width=Editor_state.left+30, height=60}
   Editor_state = edit.initialize_test_state()
   Editor_state.lines = load_array{'abc', 'def', 'ghijkl', 'mno'}
@@ -1200,27 +1183,27 @@ function test_page_down_followed_by_down_arrow_does_not_scroll_screen_up()
   Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
-  App.screen.check(y, 'abc', 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/baseline/screen:1')
+  App.screen.check(y, 'abc', 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/baseline/screen:1')
   y = y + Editor_state.line_height
-  App.screen.check(y, 'def', 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/baseline/screen:2')
+  App.screen.check(y, 'def', 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/baseline/screen:2')
   y = y + Editor_state.line_height
-  App.screen.check(y, 'ghij', 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/baseline/screen:3')
+  App.screen.check(y, 'ghij', 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/baseline/screen:3')
   -- after hitting pagedown the screen scrolls down to start of a long line
   edit.run_after_keychord(Editor_state, 'pagedown')
-  check_eq(Editor_state.screen_top1.line, 3, 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/baseline2/screen_top')
-  check_eq(Editor_state.cursor1.line, 3, 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/baseline2/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 1, 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/baseline2/cursor:pos')
+  check_eq(Editor_state.screen_top1.line, 3, 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/baseline2/screen_top')
+  check_eq(Editor_state.cursor1.line, 3, 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/baseline2/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 1, 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/baseline2/cursor:pos')
   -- after hitting down arrow the screen doesn't scroll down further, and certainly doesn't scroll up
   edit.run_after_keychord(Editor_state, 'down')
-  check_eq(Editor_state.screen_top1.line, 3, 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/screen_top')
-  check_eq(Editor_state.cursor1.line, 3, 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/cursor:line')
-  check_eq(Editor_state.cursor1.pos, 5, 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/cursor:pos')
+  check_eq(Editor_state.screen_top1.line, 3, 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/screen_top')
+  check_eq(Editor_state.cursor1.line, 3, 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/cursor:line')
+  check_eq(Editor_state.cursor1.pos, 5, 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/cursor:pos')
   y = Editor_state.top
-  App.screen.check(y, 'ghij', 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/screen:1')
+  App.screen.check(y, 'ghij', 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/screen:1')
   y = y + Editor_state.line_height
-  App.screen.check(y, 'kl', 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/screen:2')
+  App.screen.check(y, 'kl', 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/screen:2')
   y = y + Editor_state.line_height
-  App.screen.check(y, 'mno', 'F - test_page_down_followed_by_down_arrow_does_not_scroll_screen_up/screen:3')
+  App.screen.check(y, 'mno', 'F - test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up/screen:3')
 end
 
 function test_up_arrow_moves_cursor()
@@ -1520,7 +1503,7 @@ function test_inserting_text_on_final_line_avoids_scrolling_down_when_not_at_bot
   Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- after hitting the inserting_text key the screen does not scroll down
-  edit.run_after_textinput(Editor_state, 'a')
+  edit.run_after_text_input(Editor_state, 'a')
   check_eq(Editor_state.screen_top1.line, 2, 'F - test_inserting_text_on_final_line_avoids_scrolling_down_when_not_at_bottom/screen_top')
   check_eq(Editor_state.cursor1.line, 2, 'F - test_inserting_text_on_final_line_avoids_scrolling_down_when_not_at_bottom/cursor:line')
   check_eq(Editor_state.cursor1.pos, 2, 'F - test_inserting_text_on_final_line_avoids_scrolling_down_when_not_at_bottom/cursor:pos')
@@ -1546,9 +1529,9 @@ function test_typing_on_bottom_line_scrolls_down()
   y = y + Editor_state.line_height
   App.screen.check(y, 'ghi', 'F - test_typing_on_bottom_line_scrolls_down/baseline/screen:3')
   -- after typing something the line wraps and the screen scrolls down
-  edit.run_after_textinput(Editor_state, 'j')
-  edit.run_after_textinput(Editor_state, 'k')
-  edit.run_after_textinput(Editor_state, 'l')
+  edit.run_after_text_input(Editor_state, 'j')
+  edit.run_after_text_input(Editor_state, 'k')
+  edit.run_after_text_input(Editor_state, 'l')
   check_eq(Editor_state.screen_top1.line, 2, 'F - test_typing_on_bottom_line_scrolls_down/screen_top')
   check_eq(Editor_state.cursor1.line, 3, 'F - test_typing_on_bottom_line_scrolls_down/cursor:line')
   check_eq(Editor_state.cursor1.pos, 7, 'F - test_typing_on_bottom_line_scrolls_down/cursor:pos')
@@ -1700,9 +1683,9 @@ function test_position_cursor_on_recently_edited_wrapping_line()
   y = y + Editor_state.line_height
   App.screen.check(y, 'xyz', 'F - test_position_cursor_on_recently_edited_wrapping_line/baseline1/screen:3')
   -- add to the line until it's wrapping over 3 screen lines
-  edit.run_after_textinput(Editor_state, 's')
-  edit.run_after_textinput(Editor_state, 't')
-  edit.run_after_textinput(Editor_state, 'u')
+  edit.run_after_text_input(Editor_state, 's')
+  edit.run_after_text_input(Editor_state, 't')
+  edit.run_after_text_input(Editor_state, 'u')
   check_eq(Editor_state.cursor1.pos, 28, 'F - test_position_cursor_on_recently_edited_wrapping_line/cursor:pos')
   y = Editor_state.top
   App.screen.check(y, 'abc def ghi ', 'F - test_position_cursor_on_recently_edited_wrapping_line/baseline2/screen:1')
@@ -1900,7 +1883,7 @@ function test_undo_insert_text()
   Editor_state.screen_bottom1 = {}
   -- insert a character
   edit.draw(Editor_state)
-  edit.run_after_textinput(Editor_state, 'g')
+  edit.run_after_text_input(Editor_state, 'g')
   check_eq(Editor_state.cursor1.line, 2, 'F - test_undo_insert_text/baseline/cursor:line')
   check_eq(Editor_state.cursor1.pos, 5, 'F - test_undo_insert_text/baseline/cursor:pos')
   check_nil(Editor_state.selection1.line, 'F - test_undo_insert_text/baseline/selection:line')
@@ -1976,7 +1959,7 @@ function test_undo_restores_selection()
   Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- delete selected text
-  edit.run_after_textinput(Editor_state, 'x')
+  edit.run_after_text_input(Editor_state, 'x')
   check_eq(Editor_state.lines[1].data, 'xbc', 'F - test_undo_restores_selection/baseline')
   check_nil(Editor_state.selection1.line, 'F - test_undo_restores_selection/baseline:selection')
   -- undo
@@ -1999,7 +1982,7 @@ function test_search()
   edit.draw(Editor_state)
   -- search for a string
   edit.run_after_keychord(Editor_state, 'C-f')
-  edit.run_after_textinput(Editor_state, 'd')
+  edit.run_after_text_input(Editor_state, 'd')
   edit.run_after_keychord(Editor_state, 'return')
   check_eq(Editor_state.cursor1.line, 2, 'F - test_search/1/cursor:line')
   check_eq(Editor_state.cursor1.pos, 1, 'F - test_search/1/cursor:pos')
@@ -2008,7 +1991,7 @@ function test_search()
   Editor_state.screen_top1 = {line=1, pos=1}
   -- search for second occurrence
   edit.run_after_keychord(Editor_state, 'C-f')
-  edit.run_after_textinput(Editor_state, 'de')
+  edit.run_after_text_input(Editor_state, 'de')
   edit.run_after_keychord(Editor_state, 'down')
   edit.run_after_keychord(Editor_state, 'return')
   check_eq(Editor_state.cursor1.line, 4, 'F - test_search/2/cursor:line')
@@ -2027,7 +2010,7 @@ function test_search_upwards()
   edit.draw(Editor_state)
   -- search for a string
   edit.run_after_keychord(Editor_state, 'C-f')
-  edit.run_after_textinput(Editor_state, 'a')
+  edit.run_after_text_input(Editor_state, 'a')
   -- search for previous occurrence
   edit.run_after_keychord(Editor_state, 'up')
   check_eq(Editor_state.cursor1.line, 1, 'F - test_search_upwards/2/cursor:line')
@@ -2046,7 +2029,7 @@ function test_search_wrap()
   edit.draw(Editor_state)
   -- search for a string
   edit.run_after_keychord(Editor_state, 'C-f')
-  edit.run_after_textinput(Editor_state, 'a')
+  edit.run_after_text_input(Editor_state, 'a')
   edit.run_after_keychord(Editor_state, 'return')
   -- cursor wraps
   check_eq(Editor_state.cursor1.line, 1, 'F - test_search_wrap/1/cursor:line')
@@ -2065,7 +2048,7 @@ function test_search_wrap_upwards()
   edit.draw(Editor_state)
   -- search upwards for a string
   edit.run_after_keychord(Editor_state, 'C-f')
-  edit.run_after_textinput(Editor_state, 'a')
+  edit.run_after_text_input(Editor_state, 'a')
   edit.run_after_keychord(Editor_state, 'up')
   -- cursor wraps
   check_eq(Editor_state.cursor1.line, 1, 'F - test_search_wrap_upwards/1/cursor:line')
