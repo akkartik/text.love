@@ -85,6 +85,12 @@ function App.initialize_globals()
 end
 
 function App.initialize(arg)
+  love.window.setVSync(0)  -- remove some delays in exchange for risk of screen tears; we're not a game
+  love.keyboard.setTextInput(true)  -- bring up keyboard on touch screen
+  love.keyboard.setKeyRepeat(true)
+
+  love.graphics.setBackgroundColor(1,1,1)
+
   if Current_app == 'run' then
     run.initialize(arg)
   elseif Current_app == 'source' then
