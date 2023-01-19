@@ -61,7 +61,8 @@ found anything amiss: http://akkartik.name/contact
 
 ## Mirrors and Forks
 
-This repo is a fork of [lines.love](http://akkartik.name/lines.html).
+This repo is a fork of [lines.love](http://akkartik.name/lines.html), an
+editor for plain text where you can also seamlessly insert line drawings.
 Updates to it can be downloaded from the following mirrors:
 
 * https://codeberg.org/akkartik/text.love
