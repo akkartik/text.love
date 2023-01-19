@@ -61,7 +61,7 @@ found anything amiss: http://akkartik.name/contact
 
 ## Mirrors and Forks
 
-This repo is a fork of lines.love at [http://akkartik.name/lines.html](http://akkartik.name/lines.html).
+This repo is a fork of [lines.love](http://akkartik.name/lines.html).
 Updates to it can be downloaded from the following mirrors:
 
 * https://codeberg.org/akkartik/text.love
