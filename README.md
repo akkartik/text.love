@@ -65,27 +65,27 @@ This repo is a fork of [lines.love](http://akkartik.name/lines.html), an
 editor for plain text where you can also seamlessly insert line drawings.
 Updates to it can be downloaded from the following mirrors:
 
-* https://codeberg.org/akkartik/text.love
 * https://repo.or.cz/text.love.git
 * https://tildegit.org/akkartik/text.love
 * https://git.tilde.institute/akkartik/text.love
 * https://git.sr.ht/~akkartik/text.love
-* https://notabug.org/akkartik/text.love
 * https://github.com/akkartik/text.love
+* https://codeberg.org/akkartik/text.love
+* https://notabug.org/akkartik/text.love
 * https://pagure.io/text.love
 
 Further forks are encouraged. If you show me your fork, I'll link to it here.
 
-* https://codeberg.org/akkartik/view.love -- a stripped down version without
+* https://git.sr.ht/~akkartik/view.love -- a stripped down version without
   support for modifying files; useful starting point for some forks.
-* https://codeberg.org/akkartik/pong.love -- a fairly minimal example app that
+* https://git.sr.ht/~akkartik/pong.love -- a fairly minimal example app that
   can edit and debug its own source code.
-* https://codeberg.org/akkartik/template-live-editor -- a template for
+* https://git.sr.ht/~akkartik/template-live-editor -- a template for
   building "free-wheeling" live programs (easy to fork, can be modified as
   they run), with a text editor primitive.
-* https://codeberg.org/akkartik/luaML.love -- a free-wheeling 'browser' for a
+* https://git.sr.ht/~akkartik/luaML.love -- a free-wheeling 'browser' for a
   Lua-based markup language built as a live program.
-* https://codeberg.org/akkartik/driver.love -- a programming environment for
+* https://git.sr.ht/~akkartik/driver.love -- a programming environment for
   modifying free-wheeling programs while they run.
 
 ## Feedback
