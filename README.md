@@ -7,7 +7,11 @@ sharing patches between forks.
 Designed above all to be easy to modify and give you early warning if your
 modifications break something.
 
-## Invocation
+## Getting started
+
+Install [LÖVE](https://love2d.org). It's just a 5MB download, open-source and
+extremely well-behaved. I'll assume below that you can invoke it using the
+`love` command, but that might vary depending on your OS.
 
 To run from the terminal, [pass this directory to LÖVE](https://love2d.org/wiki/Getting_Started#Running_Games),
 optionally with a file path to edit.
