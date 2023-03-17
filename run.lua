@@ -32,6 +32,7 @@ function run.initialize(arg)
     load_from_disk(Editor_state)
     Text.redraw_all(Editor_state)
   end
+  edit.check_locs(Editor_state)
   love.window.setTitle('text.love - '..Editor_state.filename)
 
   if #arg > 1 then
@@ -108,6 +109,7 @@ function run.file_drop(file)
   Editor_state.lines = load_from_file(file)
   file:close()
   Text.redraw_all(Editor_state)
+  edit.check_locs(Editor_state)
   love.window.setTitle('text.love - '..Editor_state.filename)
 end
 

@@ -74,6 +74,22 @@ function edit.initialize_state(top, left, right, font_height, line_height)  -- c
   return result
 end  -- App.initialize_state
 
+function edit.check_locs(State)
+  -- if State is inconsistent (i.e. file changed by some other program),
+  --   throw away all cursor state entirely
+  if edit.invalid1(State, State.screen_top1)
+      or edit.invalid1(State, State.cursor1)
+      or not Text.le1(State.screen_top1, State.cursor1) then
+    State.screen_top1 = {line=1, pos=1}
+    State.cursor1 = {line=1, pos=1}
+  end
+end
+
+function edit.invalid1(State, loc1)
+  return loc1.line > #State.lines
+      or loc1.pos > #State.lines[loc1.line].data
+end
+
 function edit.draw(State)
   App.color(Text_color)
   assert(#State.lines == #State.line_cache)
