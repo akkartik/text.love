@@ -61,8 +61,6 @@ found anything amiss: http://akkartik.name/contact
 
 * No scrollbars yet. That stuff is hard.
 
-* When editing sources, selecting text is not yet completely implemented.
-
 ## Mirrors and Forks
 
 This repo is a fork of [lines.love](http://akkartik.name/lines.html), an
