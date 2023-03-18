@@ -92,7 +92,10 @@ end
 
 function edit.draw(State)
   App.color(Text_color)
-  assert(#State.lines == #State.line_cache)
+  if #State.lines ~= #State.line_cache then
+    print(('line_cache is out of date; %d when it should be %d'):format(#State.line_cache, #State.lines))
+    assert(false)
+  end
   if not Text.le1(State.screen_top1, State.cursor1) then
     print(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos)
     assert(false)
@@ -254,8 +257,10 @@ function edit.keychord_press(State, chord, key)
     edit.update_font_settings(State, State.font_height+2)
     Text.redraw_all(State)
   elseif chord == 'C--' then
-    edit.update_font_settings(State, State.font_height-2)
-    Text.redraw_all(State)
+    if State.font_height > 2 then
+      edit.update_font_settings(State, State.font_height-2)
+      Text.redraw_all(State)
+    end
   elseif chord == 'C-0' then
     edit.update_font_settings(State, 20)
     Text.redraw_all(State)

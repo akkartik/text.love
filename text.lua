@@ -154,7 +154,6 @@ function Text.text_input(State, t)
   if State.cursor_y > App.screen.height - State.line_height then
     Text.populate_screen_line_starting_pos(State, State.cursor1.line)
     Text.snap_cursor_to_bottom_of_screen(State, State.left, State.right)
---?     print('=>', State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos, State.screen_bottom1.line, State.screen_bottom1.pos)
   end
   record_undo_event(State, {before=before, after=snapshot(State, State.cursor1.line)})
 end
@@ -224,9 +223,10 @@ function Text.keychord_press(State, chord)
       local line_cache = State.line_cache[#State.line_cache]
       State.screen_top1 = {line=#State.lines, pos=line_cache.screen_line_starting_pos[#line_cache.screen_line_starting_pos]}
     elseif Text.lt1(State.cursor1, State.screen_top1) then
-      local top2 = Text.to2(State, State.screen_top1)
-      top2 = Text.previous_screen_line(State, top2, State.left, State.right)
-      State.screen_top1 = Text.to1(State, top2)
+      State.screen_top1 = {
+        line=State.cursor1.line,
+        pos=Text.pos_at_start_of_screen_line(State, State.cursor1),
+      }
       Text.redraw_all(State)  -- if we're scrolling, reclaim all fragments to avoid memory leaks
     end
     Text.clear_screen_line_cache(State, State.cursor1.line)
@@ -431,9 +431,11 @@ function Text.up(State)
 --?     print('cursor pos is now '..tostring(State.cursor1.pos))
   end
   if Text.lt1(State.cursor1, State.screen_top1) then
-    local top2 = Text.to2(State, State.screen_top1)
-    top2 = Text.previous_screen_line(State, top2)
-    State.screen_top1 = Text.to1(State, top2)
+    State.screen_top1 = {
+      line=State.cursor1.line,
+      pos=Text.pos_at_start_of_screen_line(State, State.cursor1),
+    }
+    Text.redraw_all(State)  -- if we're scrolling, reclaim all fragments to avoid memory leaks
   end
 end
 
@@ -555,9 +557,11 @@ function Text.left(State)
     State.cursor1.pos = utf8.len(State.lines[State.cursor1.line].data) + 1
   end
   if Text.lt1(State.cursor1, State.screen_top1) then
-    local top2 = Text.to2(State, State.screen_top1)
-    top2 = Text.previous_screen_line(State, top2)
-    State.screen_top1 = Text.to1(State, top2)
+    State.screen_top1 = {
+      line=State.cursor1.line,
+      pos=Text.pos_at_start_of_screen_line(State, State.cursor1),
+    }
+    Text.redraw_all(State)  -- if we're scrolling, reclaim all fragments to avoid memory leaks
   end
 end
 
@@ -610,7 +614,7 @@ function Text.snap_cursor_to_bottom_of_screen(State)
 --?   print('to2: =>', top2.line, top2.screen_line, top2.screen_pos)
   -- slide to start of screen line
   top2.screen_pos = 1  -- start of screen line
---?   print('snap', State.screen_top1.line, State.screen_top1.pos, State.screen_top1.posB, State.cursor1.line, State.cursor1.pos, State.screen_bottom1.line, State.screen_bottom1.pos)
+--?   print('snap', State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos, State.screen_bottom1.line, State.screen_bottom1.pos)
 --?   print('cursor pos '..tostring(State.cursor1.pos)..' is on the #'..tostring(top2.screen_line)..' screen line down')
   local y = App.screen.height - State.line_height
   -- duplicate some logic from love.draw
