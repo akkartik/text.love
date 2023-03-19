@@ -105,16 +105,7 @@ end
 function source.load_settings()
   local settings = Settings.source
   love.graphics.setFont(love.graphics.newFont(settings.font_height))
-  -- maximize window to determine maximum allowable dimensions
-  App.screen.resize(0, 0)  -- maximize
-  Display_width, Display_height, App.screen.flags = App.screen.size()
-  -- set up desired window dimensions
-  App.screen.flags.resizable = true
-  App.screen.flags.minwidth = math.min(Display_width, 200)
-  App.screen.flags.minheight = math.min(Display_height, 200)
-  App.screen.width, App.screen.height = settings.width, settings.height
---?   print('setting window from settings:', App.screen.width, App.screen.height)
-  App.screen.resize(App.screen.width, App.screen.height, App.screen.flags)
+  source.resize_window_from_settings(settings)
 --?   print('loading source position', settings.x, settings.y, settings.displayindex)
   source.set_window_position_from_settings(settings)
   Show_log_browser_side = settings.show_log_browser_side
@@ -136,9 +127,29 @@ function source.load_settings()
   end
 end
 
+function source.resize_window_from_settings(settings)
+  local os = love.system.getOS()
+  if os == 'Android' or os == 'iOS' then
+    -- maximizing on iOS breaks text rendering: https://github.com/deltadaedalus/vudu/issues/7
+    -- no point second-guessing window dimensions on mobile
+    App.screen.width, App.screen.height, App.screen.flags = App.screen.size()
+    return
+  end
+  -- maximize window to determine maximum allowable dimensions
+  App.screen.resize(0, 0)  -- maximize
+  Display_width, Display_height, App.screen.flags = App.screen.size()
+  -- set up desired window dimensions
+  App.screen.flags.resizable = true
+  App.screen.flags.minwidth = math.min(Display_width, 200)
+  App.screen.flags.minheight = math.min(Display_height, 200)
+  App.screen.width, App.screen.height = settings.width, settings.height
+--?   print('setting window from settings:', App.screen.width, App.screen.height)
+  App.screen.resize(App.screen.width, App.screen.height, App.screen.flags)
+end
+
 function source.set_window_position_from_settings(settings)
-  -- setPosition doesn't quite seem to do what is asked of it on Linux.
-  love.window.setPosition(settings.x, settings.y-37, settings.displayindex)
+  -- love.window.setPosition doesn't quite seem to do what is asked of it on Linux.
+  App.screen.move(settings.x, settings.y-37, settings.displayindex)
 end
 
 function source.initialize_default_settings()
@@ -154,6 +165,13 @@ function source.initialize_default_settings()
 end
 
 function source.initialize_window_geometry(em_width)
+  local os = love.system.getOS()
+  if os == 'Android' or os == 'iOS' then
+    -- maximizing on iOS breaks text rendering: https://github.com/deltadaedalus/vudu/issues/7
+    -- no point second-guessing window dimensions on mobile
+    App.screen.width, App.screen.height, App.screen.flags = App.screen.size()
+    return
+  end
   -- maximize window
   App.screen.resize(0, 0)  -- maximize
   Display_width, Display_height, App.screen.flags = App.screen.size()
