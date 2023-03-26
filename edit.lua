@@ -86,8 +86,10 @@ function edit.check_locs(State)
 end
 
 function edit.invalid1(State, loc1)
-  return loc1.line > #State.lines
-      or loc1.pos > #State.lines[loc1.line].data
+  if loc1.line > #State.lines then return true end
+  local l = State.lines[loc1.line]
+  if l.mode ~= 'text' then return false end  -- pos is irrelevant to validity for a drawing line
+  return loc1.pos > #State.lines[loc1.line].data
 end
 
 function edit.draw(State)
@@ -147,7 +149,7 @@ end
 
 function edit.mouse_press(State, x,y, mouse_button)
   if State.search_term then return end
---?   print('press', State.selection1.line, State.selection1.pos)
+--?   print('press', State.cursor1.line)
   for line_index,line in ipairs(State.lines) do
     if Text.in_line(State, line_index, x,y) then
       -- delicate dance between cursor, selection and old cursor/selection
@@ -174,7 +176,7 @@ end
 
 function edit.mouse_release(State, x,y, mouse_button)
   if State.search_term then return end
---?   print('release')
+--?   print('release', State.cursor1.line)
   for line_index,line in ipairs(State.lines) do
     if Text.in_line(State, line_index, x,y) then
 --?       print('reset selection')
@@ -215,6 +217,7 @@ function edit.mouse_wheel_move(State, dx,dy)
 end
 
 function edit.text_input(State, t)
+--?   print('text input', t)
   if State.search_term then
     State.search_term = State.search_term..t
     State.search_text = nil
