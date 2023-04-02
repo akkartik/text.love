@@ -12,21 +12,20 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
   local x = State.left
   local pos = 1
   local screen_line_starting_pos = startpos
-  Text.compute_fragments(State, line_index)
+  Text.populate_screen_line_starting_pos(State, line_index)
   local pos = 1
   initialize_color()
   for _, f in ipairs(line_cache.fragments) do
     App.color(Text_color)
-    local frag, frag_text = f.data, f.text
-    select_color(frag)
-    local frag_len = utf8.len(frag)
---?     print('text.draw:', frag, 'at', line_index,pos, 'after', x,y)
+    select_color(f)
+    local frag_len = utf8.len(f)
+--?     print('text.draw:', f, 'at', line_index,pos, 'after', x,y)
     if pos < startpos then
       -- render nothing
---?       print('skipping', frag)
+--?       print('skipping', f)
     else
       -- render fragment
-      local frag_width = App.width(frag_text)
+      local frag_width = App.width(f)
       if x + frag_width > State.right then
         assert(x > State.left)  -- no overfull lines
         y = y + State.line_height
@@ -41,12 +40,11 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
         Text.draw_highlight(State, line, x,y, pos, lo,hi)
       end
       -- Make [[WikiWords]] (single word, all in one screen line) clickable.
-      local trimmed_word = rtrim(frag)  -- compute_fragments puts whitespace at the end
+      local trimmed_word = rtrim(f)  -- compute_fragments puts whitespace at the end
       if starts_with(trimmed_word, '[[') and ends_with(trimmed_word, ']]') then
         local filename = trimmed_word:gsub('^..(.*)..$', '%1')
         if source.link_exists(State, filename) then
-          local filename_text = App.newText(love.graphics.getFont(), filename)
-          button(State, 'link', {x=x+App.width(to_text('[[')), y=y, w=App.width(filename_text), h=State.line_height, color={1,1,1},
+          button(State, 'link', {x=x+App.width('[['), y=y, w=App.width(filename), h=State.line_height, color={1,1,1},
             icon = icon.hyperlink_decoration,
             onpress1 = function()
                          source.switch_to_file(filename)
@@ -54,7 +52,7 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
           })
         end
       end
-      App.screen.draw(frag_text, x,y)
+      App.screen.print(f, x,y)
       -- render cursor if necessary
       if line_index == State.cursor1.line then
         if pos <= State.cursor1.pos and pos + frag_len > State.cursor1.pos then
@@ -65,7 +63,7 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
               love.graphics.print(State.search_term, x+lo_px,y)
             end
           elseif Focus == 'edit' then
-            Text.draw_cursor(State, x+Text.x(frag, State.cursor1.pos-pos+1), y)
+            Text.draw_cursor(State, x+Text.x(f, State.cursor1.pos-pos+1), y)
             App.color(Text_color)
           end
         end
@@ -105,21 +103,18 @@ function Text.populate_screen_line_starting_pos(State, line_index)
   local x = State.left
   local pos = 1
   for _, f in ipairs(line_cache.fragments) do
-    local frag, frag_text = f.data, f.text
     -- render fragment
-    local frag_width = App.width(frag_text)
+    local frag_width = App.width(f)
     if x + frag_width > State.right then
       x = State.left
       table.insert(line_cache.screen_line_starting_pos, pos)
     end
     x = x + frag_width
-    local frag_len = utf8.len(frag)
-    pos = pos + frag_len
+    pos = pos + utf8.len(f)
   end
 end
 
 function Text.compute_fragments(State, line_index)
---?   print('compute_fragments', line_index, 'between', State.left, State.right)
   local line = State.lines[line_index]
   if line.mode ~= 'text' then return end
   local line_cache = State.line_cache[line_index]
@@ -130,35 +125,25 @@ function Text.compute_fragments(State, line_index)
   local x = State.left
   -- try to wrap at word boundaries
   for frag in line.data:gmatch('%S*%s*') do
-    local frag_text = App.newText(love.graphics.getFont(), frag)
-    local frag_width = App.width(frag_text)
---?     print('x: '..tostring(x)..'; frag_width: '..tostring(frag_width)..'; '..tostring(State.right-x)..'px to go')
+    local frag_width = App.width(frag)
     while x + frag_width > State.right do
---?       print(('checking whether to split fragment ^%s$ of width %d when rendering from %d'):format(frag, frag_width, x))
       if (x-State.left) < 0.8 * (State.right-State.left) then
---?         print('splitting')
         -- long word; chop it at some letter
         -- We're not going to reimplement TeX here.
         local bpos = Text.nearest_pos_less_than(frag, State.right - x)
---?         print('bpos', bpos)
         if bpos == 0 then break end  -- avoid infinite loop when window is too narrow
         local boffset = Text.offset(frag, bpos+1)  -- byte _after_ bpos
---?         print('space for '..tostring(bpos)..' graphemes, '..tostring(boffset-1)..' bytes')
         local frag1 = string.sub(frag, 1, boffset-1)
-        local frag1_text = App.newText(love.graphics.getFont(), frag1)
-        local frag1_width = App.width(frag1_text)
---?         print('extracting ^'..frag1..'$ of width '..tostring(frag1_width)..'px')
+        local frag1_width = App.width(frag1)
         assert(x + frag1_width <= State.right)
-        table.insert(line_cache.fragments, {data=frag1, text=frag1_text})
+        table.insert(line_cache.fragments, frag1)
         frag = string.sub(frag, boffset)
-        frag_text = App.newText(love.graphics.getFont(), frag)
-        frag_width = App.width(frag_text)
+        frag_width = App.width(frag)
       end
       x = State.left  -- new line
     end
     if #frag > 0 then
---?       print('inserting ^'..frag..'$ of width '..tostring(frag_width)..'px')
-      table.insert(line_cache.fragments, {data=frag, text=frag_text})
+      table.insert(line_cache.fragments, frag)
     end
     x = x + frag_width
   end
@@ -776,8 +761,7 @@ function Text.screen_line_width(State, line_index, i)
   else
     screen_line = string.sub(line.data, start_pos)
   end
-  local screen_line_text = App.newText(love.graphics.getFont(), screen_line)
-  return App.width(screen_line_text)
+  return App.width(screen_line)
 end
 
 function Text.screen_line_index(screen_line_starting_pos, pos)
@@ -865,15 +849,13 @@ function Text.x_after(s, pos)
   local offset = Text.offset(s, math.min(pos+1, #s+1))
   local s_before = s:sub(1, offset-1)
 --?   print('^'..s_before..'$')
-  local text_before = App.newText(love.graphics.getFont(), s_before)
-  return App.width(text_before)
+  return App.width(s_before)
 end
 
 function Text.x(s, pos)
   local offset = Text.offset(s, pos)
   local s_before = s:sub(1, offset-1)
-  local text_before = App.newText(love.graphics.getFont(), s_before)
-  return App.width(text_before)
+  return App.width(s_before)
 end
 
 function Text.to2(State, loc1)

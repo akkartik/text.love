@@ -137,7 +137,7 @@ function App.run_tests_and_initialize()
   Test_errors = {}
   App.run_tests()
   if #Test_errors > 0 then
-    error('There were test failures:\n\n'..table.concat(Test_errors))
+    error(('There were %d test failures:\n\n%s'):format(#Test_errors, table.concat(Test_errors)))
   end
   App.disable_tests()
   App.initialize_globals()
@@ -210,16 +210,8 @@ function App.wait_fake_time(t)
   App.time = App.time + t
 end
 
--- LÖVE's Text primitive retains no trace of the string it was created from,
--- so we'll wrap it for our tests.
---
--- This implies that we need to hook any operations we need on Text objects.
-function App.newText(font, s)
-  return {type='text', data=s, text=love.graphics.newText(font, s)}
-end
-
 function App.width(text)
-  return text.text:getWidth()
+  return love.graphics.getFont():getWidth(text)
 end
 
 function App.screen.draw(obj, x,y)
@@ -381,7 +373,7 @@ end
 -- prepend file/line/test
 function prepend_debug_info_to_test_failure(test_name, err)
   local err_without_line_number = err:gsub('^[^:]*:[^:]*: ', '')
-  local stack_trace = debug.traceback('', --[[stack frame]]4)
+  local stack_trace = debug.traceback('', --[[stack frame]]5)
   local file_and_line_number = stack_trace:gsub('stack traceback:\n', ''):gsub(': .*', '')
   local full_error = file_and_line_number..':'..test_name..' -- '..err_without_line_number
 --?   local full_error = file_and_line_number..':'..test_name..' -- '..err_without_line_number..'\t\t'..stack_trace:gsub('\n', '\n\t\t')
@@ -423,9 +415,7 @@ function App.disable_tests()
   App.screen.move = love.window.setPosition
   App.screen.position = love.window.getPosition
   App.screen.print = love.graphics.print
-  App.newText = love.graphics.newText
   App.screen.draw = love.graphics.draw
-  App.width = function(text) return text:getWidth() end
   if Current_app == nil or Current_app == 'run' then
     App.open_for_reading = function(filename) return io.open(filename, 'r') end
     App.open_for_writing = function(filename) return io.open(filename, 'w') end

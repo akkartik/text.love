@@ -162,13 +162,11 @@ end
 function source.initialize_default_settings()
   local font_height = 20
   love.graphics.setFont(love.graphics.newFont(font_height))
-  local em = App.newText(love.graphics.getFont(), 'm')
-  source.initialize_window_geometry(App.width(em))
+  source.initialize_window_geometry(App.width('m'))
   Editor_state = edit.initialize_state(Margin_top, Margin_left, App.screen.width-Margin_right)
   Editor_state.filename = 'run.lua'
   Editor_state.font_height = font_height
   Editor_state.line_height = math.floor(font_height*1.3)
-  Editor_state.em = em
 end
 
 function source.initialize_window_geometry(em_width)
@@ -417,12 +415,4 @@ function source.key_release(key, scancode)
   else
     return log_browser.keychord_press(Log_browser_state, chordkey, scancode)
   end
-end
-
--- use this sparingly
-function to_text(s)
-  if Text_cache[s] == nil then
-    Text_cache[s] = App.newText(love.graphics.getFont(), s)
-  end
-  return Text_cache[s]
 end
