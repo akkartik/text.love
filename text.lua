@@ -2,7 +2,7 @@
 Text = {}
 
 -- draw a line starting from startpos to screen at y between State.left and State.right
--- return the final y, and position of start of final screen line drawn
+-- return y for the next line, and position of start of final screen line drawn
 function Text.draw(State, line_index, y, startpos)
 --?   print('text.draw', line_index, y)
   local line = State.lines[line_index]
@@ -50,7 +50,7 @@ function Text.draw(State, line_index, y, startpos)
       end
     end
   end
-  return y - State.line_height, final_screen_line_starting_pos
+  return y, final_screen_line_starting_pos
 end
 
 function Text.screen_line(line, line_cache, i)
@@ -69,7 +69,6 @@ function Text.draw_cursor(State, x, y)
   if math.floor(Cursor_time*2)%2 == 0 then
     App.color(Cursor_color)
     love.graphics.rectangle('fill', x,y, 3,State.line_height)
-    App.color(Text_color)
   end
   State.cursor_x = x
   State.cursor_y = y+State.line_height
@@ -860,7 +859,7 @@ end
 
 -- slightly expensive since it redraws the screen
 function Text.cursor_out_of_screen(State)
-  App.draw()
+  edit.draw(State)
   return State.cursor_y == nil
   -- this approach is cheaper and almost works, except on the final screen
   -- where file ends above bottom of screen

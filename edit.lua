@@ -115,7 +115,6 @@ function edit.draw(State)
       startpos = State.screen_top1.pos
     end
     y, State.screen_bottom1.pos = Text.draw(State, line_index, y, startpos)
-    y = y + State.line_height
 --?     print('=> y', y)
   end
   if State.search_term then
@@ -352,7 +351,6 @@ function edit.update_font_settings(State, font_height)
   State.font_height = font_height
   love.graphics.setFont(love.graphics.newFont(State.font_height))
   State.line_height = math.floor(font_height*1.3)
-  Text_cache = {}
 end
 
 --== some methods for tests
