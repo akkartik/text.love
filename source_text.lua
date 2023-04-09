@@ -18,12 +18,12 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
     local pos = line_cache.screen_line_starting_pos[i]
     if pos < startpos then
       -- render nothing
---?       print('skipping', f)
+--?       print('skipping', screen_line)
     else
       final_screen_line_starting_pos = pos
-      local f = Text.screen_line(line, line_cache, i)
---?       print('text.draw:', f, 'at', line_index,pos, 'after', x,y)
-      local frag_len = utf8.len(f)
+      local screen_line = Text.screen_line(line, line_cache, i)
+--?       print('text.draw:', screen_line, 'at', line_index,pos, 'after', x,y)
+      local frag_len = utf8.len(screen_line)
       -- render any link decorations
       for _,link_offsets in ipairs(line_cache.link_offsets) do
         local s,e,filename = unpack(link_offsets)
@@ -44,8 +44,13 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
         local lo, hi = Text.clip_selection(State, line_index, pos, pos+frag_len)
         Text.draw_highlight(State, line, State.left,y, pos, lo,hi)
       end
-      select_color(f)
-      App.screen.print(f, State.left,y)
+      -- render colorized text
+      local x = State.left
+      for frag in screen_line:gmatch('%S*%s*') do
+        select_color(frag)
+        App.screen.print(frag, x,y)
+        x = x+App.width(frag)
+      end
       -- render cursor if necessary
       if not hide_cursor and line_index == State.cursor1.line then
         if pos <= State.cursor1.pos and pos + frag_len >= State.cursor1.pos then
@@ -56,7 +61,7 @@ function Text.draw(State, line_index, y, startpos, hide_cursor)
               love.graphics.print(State.search_term, State.left+lo_px,y)
             end
           elseif Focus == 'edit' then
-            Text.draw_cursor(State, State.left+Text.x(f, State.cursor1.pos-pos+1), y)
+            Text.draw_cursor(State, State.left+Text.x(screen_line, State.cursor1.pos-pos+1), y)
           end
         end
       end
