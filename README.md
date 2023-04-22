@@ -21,8 +21,8 @@ Alternatively, turn it into a .love file you can double-click on:
 $ zip -r /tmp/text.love *.lua
 ```
 
-By default, it reads/writes the file `lines.txt` in a directory
-specific to this app (https://love2d.org/wiki/love.filesystem.getSourceBaseDirectory).
+By default, it reads/writes the file `lines.txt` in
+[a directory relative to this app](https://love2d.org/wiki/love.filesystem.getSourceBaseDirectory).
 
 To open a different file, drop it on the app window.
 
