@@ -231,6 +231,14 @@ locations in the widget are `cursor1` describing where text is inserted or
 deleted and `screen_top1` which specifies how far down the lines is currently
 visible on screen.
 
+Some constants that affect editor behavior:
+* `Margin_top`, `Margin_left`, `Margin_right` are integers in pixel units that
+  affect where the editor is drawn on window (it always extends to bottom of
+  window as needed)
+
+* Various color constants are represented as tables with r/g/b keys:
+  * `Text_color`, `Cursor_color`, `Highlight_color` for drawing text.
+
 ### clickable buttons
 
 There's a facility for rendering buttons and responding to events when they're

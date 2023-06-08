@@ -1,7 +1,6 @@
 -- some constants people might like to tweak
 Text_color = {r=0, g=0, b=0}
 Cursor_color = {r=1, g=0, b=0}
-Focus_stroke_color = {r=1, g=0, b=0}  -- what mouse is hovering over
 Highlight_color = {r=0.7, g=0.7, b=0.9}  -- selected text
 
 Margin_top = 15
