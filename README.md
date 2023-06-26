@@ -70,6 +70,7 @@ Updates to it can be downloaded from the following mirrors:
 * https://codeberg.org/akkartik/text.love
 * https://notabug.org/akkartik/text.love
 * https://pagure.io/text.love
+* https://nest.pijul.com/akkartik/text.love (using the Pijul version control system)
 
 Further forks are encouraged. If you show me your fork, I'll link to it here.
 
