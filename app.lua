@@ -2,6 +2,7 @@
 --
 -- Most apps can just use the default shown in https://love2d.org/wiki/love.run,
 -- but we need to override it to:
+--   * recover from errors (by switching to the source editor)
 --   * run all tests (functions starting with 'test_') on startup, and
 --   * save some state that makes it possible to switch between the main app
 --     and a source editor, while giving each the illusion of complete
@@ -24,19 +25,33 @@ function love.run()
             return a or 0
           end
         end
-        love.handlers[name](a,b,c,d,e,f)
+        xpcall(function() love.handlers[name](a,b,c,d,e,f) end, handle_error)
       end
     end
 
     dt = love.timer.step()
-    App.update(dt)
+    xpcall(function() App.update(dt) end, handle_error)
 
     love.graphics.origin()
     love.graphics.clear(love.graphics.getBackgroundColor())
-    App.draw()
+    xpcall(App.draw, handle_error)
     love.graphics.present()
 
     love.timer.sleep(0.001)
+  end
+end
+
+function handle_error(err)
+  Error_message = debug.traceback('Error: ' .. tostring(err), --[[stack frame]]2):gsub('\n[^\n]+$', '')
+  print(Error_message)
+  if Current_app == 'run' then
+    Settings.current_app = 'source'
+    love.filesystem.write('config', json.encode(Settings))
+    load_file_from_source_or_save_directory('main.lua')
+    App.undo_initialize()
+    App.run_tests_and_initialize()
+  else
+    love.event.quit()
   end
 end
 
@@ -348,13 +363,29 @@ end
 
 nativefs = require 'nativefs'
 
+local Keys_down = {}
+
 -- call this once all tests are run
 -- can't run any tests after this
 function App.disable_tests()
   -- have LÖVE delegate all handlers to App if they exist
   for name in pairs(love.handlers) do
     if App[name] then
-      love.handlers[name] = App[name]
+      -- love.keyboard.isDown doesn't work on Android, so emulate it using
+      -- keypressed and keyreleased events
+      if name == 'keypressed' then
+        love.handlers[name] = function(key, scancode, isrepeat)
+                                Keys_down[key] = true
+                                return App.keypressed(key, scancode, isrepeat)
+                              end
+      elseif name == 'keyreleased' then
+        love.handlers[name] = function(key, scancode)
+                                Keys_down[key] = nil
+                                return App.keyreleased(key, scancode)
+                              end
+      else
+        love.handlers[name] = App[name]
+      end
     end
   end
 
@@ -410,7 +441,7 @@ function App.disable_tests()
   App.get_time = love.timer.getTime
   App.get_clipboard = love.system.getClipboardText
   App.set_clipboard = love.system.setClipboardText
-  App.key_down = love.keyboard.isDown
+  App.key_down = function(key) return Keys_down[key] end
   App.mouse_move = love.mouse.setPosition
   App.mouse_down = love.mouse.isDown
   App.mouse_x = love.mouse.getX
