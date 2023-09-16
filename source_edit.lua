@@ -89,7 +89,7 @@ function edit.initialize_state(top, left, right, font_height, line_height)  -- c
     line_height = line_height,
 
     top = top,
-    left = math.floor(left),
+    left = math.floor(left),  -- left margin for text; line numbers go to the left of this
     right = math.floor(right),
     width = right-left,
 
@@ -115,7 +115,7 @@ function edit.check_locs(State)
       or not edit.cursor_on_text(State)
       or not Text.le1(State.screen_top1, State.cursor1) then
     State.screen_top1 = {line=1, pos=1}
-    edit.put_cursor_on_first_text_line(State)
+    edit.put_cursor_on_next_text_line(State)
   end
 end
 
@@ -131,16 +131,20 @@ function edit.cursor_on_text(State)
       and State.lines[State.cursor1.line].mode == 'text'
 end
 
-function edit.put_cursor_on_first_text_line(State)
-  for i,line in ipairs(State.lines) do
-    if line.mode == 'text' then
-      State.cursor1 = {line=i, pos=1}
-      break
-    end
+function edit.put_cursor_on_next_text_line(State)
+  while true do
+  if State.cursor1.line >= #State.lines then
+    break
+  end
+  if State.lines[State.cursor1.line].mode == 'text' then
+    break
+  end
+  State.cursor1.line = State.cursor1.line+1
+  State.cursor1.pos = 1
   end
 end
 
-function edit.draw(State, hide_cursor)
+function edit.draw(State, hide_cursor, show_line_numbers)
   State.button_handlers = {}
   App.color(Text_color)
   if #State.lines ~= #State.line_cache then
@@ -169,7 +173,11 @@ function edit.draw(State, hide_cursor)
       end
       if line.data == '' then
         -- button to insert new drawing
-        button(State, 'draw', {x=4, y=y+4, w=12,h=12, color={1,1,0},
+        local buttonx = State.left-Margin_left+4
+        if show_line_numbers then
+          buttonx = 4  -- HACK: position draw buttons at a fixed x on screen
+        end
+        button(State, 'draw', {x=buttonx, y=y+4, w=12,h=12, color={1,1,0},
           icon = icon.insert_drawing,
           onpress1 = function()
                        Drawing.before = snapshot(State, line_index-1, line_index)
@@ -183,7 +191,7 @@ function edit.draw(State, hide_cursor)
                      end,
         })
       end
-      y, screen_bottom1.pos = Text.draw(State, line_index, y, startpos, hide_cursor)
+      y, screen_bottom1.pos = Text.draw(State, line_index, y, startpos, hide_cursor, show_line_numbers)
 --?       print('=> y', y)
     elseif line.mode == 'drawing' then
       y = y+Drawing_padding_top
@@ -329,11 +337,13 @@ end
 function edit.mouse_wheel_move(State, dx,dy)
   if dy > 0 then
     State.cursor1 = {line=State.screen_top1.line, pos=State.screen_top1.pos}
+    edit.put_cursor_on_next_text_line(State)
     for i=1,math.floor(dy) do
       Text.up(State)
     end
   elseif dy < 0 then
     State.cursor1 = {line=State.screen_bottom1.line, pos=State.screen_bottom1.pos}
+    edit.put_cursor_on_next_text_line(State)
     for i=1,math.floor(-dy) do
       Text.down(State)
     end

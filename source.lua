@@ -74,7 +74,7 @@ function source.initialize()
 
 
   -- keep a few blank lines around: https://merveilles.town/@akkartik/110084833821965708
-  love.window.setTitle('text.love - source')
+  love.window.setTitle('text.love - source - '..Editor_state.filename)
 
 
 
@@ -237,7 +237,7 @@ function source.switch_to_file(filename)
 end
 
 function source.draw()
-  edit.draw(Editor_state, --[[hide cursor?]] Show_file_navigator)
+  edit.draw(Editor_state, --[[hide cursor?]] Show_file_navigator, --[[show line numbers]] true)
   if Show_log_browser_side then
     -- divider
     App.color(Divider_color)

@@ -129,8 +129,8 @@ end
 
 function navigate_to_file(s)
   move_candidate_to_front(s)
-  local candidate = guess_source(s..'.lua')
-  source.switch_to_file(candidate)
+  source.switch_to_file(s..'.lua')
+  love.window.setTitle('lines.love - source - '..Editor_state.filename)
   reset_file_navigator()
 end
 

@@ -191,8 +191,9 @@ function Drawing.draw_pending_shape(drawing, top, left,right)
     if mx < 0 or mx >= 256 or my < 0 or my >= drawing.h then
       return
     end
+    local r = round(geom.dist(center.x, center.y, mx, my))
     local cx,cy = px(center.x), py(center.y)
-    love.graphics.circle('line', cx,cy, geom.dist(cx,cy, App.mouse_x(),App.mouse_y()))
+    love.graphics.circle('line', cx,cy, Drawing.pixels(r, width))
   elseif shape.mode == 'arc' then
     local center = drawing.points[shape.center]
     if mx < 0 or mx >= 256 or my < 0 or my >= drawing.h then
@@ -248,6 +249,12 @@ function Drawing.update(State)
   if State.lines.current_drawing == nil then return end
   local drawing = State.lines.current_drawing
   local line_cache = State.line_cache[State.lines.current_drawing_index]
+  if line_cache.starty == nil then
+    -- some event cleared starty just this frame
+    -- draw in this frame will soon set starty
+    -- just skip this frame
+    return
+  end
   assert(drawing.mode == 'drawing')
   local pmx, pmy = App.mouse_x(), App.mouse_y()
   local mx = Drawing.coord(pmx-State.left, State.width)
