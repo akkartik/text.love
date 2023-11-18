@@ -12,7 +12,7 @@ function Text.draw(State, line_index, y, startpos)
   -- wrap long lines
   local final_screen_line_starting_pos = startpos  -- track value to return
   Text.populate_screen_line_starting_pos(State, line_index)
-  assert(#line_cache.screen_line_starting_pos >= 1)
+  assert(#line_cache.screen_line_starting_pos >= 1, 'line cache missing screen line info')
   for i=1,#line_cache.screen_line_starting_pos do
     local pos = line_cache.screen_line_starting_pos[i]
     if pos < startpos then
@@ -205,7 +205,7 @@ function Text.keychord_press(State, chord)
       Text.redraw_all(State)  -- if we're scrolling, reclaim all fragments to avoid memory leaks
     end
     Text.clear_screen_line_cache(State, State.cursor1.line)
-    assert(Text.le1(State.screen_top1, State.cursor1))
+    assert(Text.le1(State.screen_top1, State.cursor1), ('screen_top (line=%d,pos=%d) is below cursor (line=%d,pos=%d)'):format(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos))
     schedule_save(State)
     record_undo_event(State, {before=before, after=snapshot(State, State.cursor1.line)})
   elseif chord == 'delete' then
@@ -398,7 +398,7 @@ function Text.up(State)
     end
   else
     -- move up one screen line in current line
-    assert(screen_line_index > 1)
+    assert(screen_line_index > 1, 'bumped up against top screen line in line')
     local new_screen_line_starting_pos = State.line_cache[State.cursor1.line].screen_line_starting_pos[screen_line_index-1]
     local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line].data, new_screen_line_starting_pos)
     local s = string.sub(State.lines[State.cursor1.line].data, new_screen_line_starting_byte_offset)
@@ -416,7 +416,7 @@ end
 
 function Text.down(State)
 --?   print('down', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos, State.screen_bottom1.line, State.screen_bottom1.pos)
-  assert(State.cursor1.pos)
+  assert(State.cursor1.pos, 'cursor has no pos')
   if Text.cursor_at_final_screen_line(State) then
     -- line is done, skip to next text line
 --?     print('cursor at final screen line of its line')
@@ -484,7 +484,7 @@ function Text.word_left(State)
     if State.cursor1.pos == 1 then
       break
     end
-    assert(State.cursor1.pos > 1)
+    assert(State.cursor1.pos > 1, 'bumped up against start of line')
     if Text.match(State.lines[State.cursor1.line].data, State.cursor1.pos-1, '%s') then
       break
     end
@@ -518,9 +518,8 @@ end
 
 function Text.match(s, pos, pat)
   local start_offset = Text.offset(s, pos)
-  assert(start_offset)
   local end_offset = Text.offset(s, pos+1)
-  assert(end_offset > start_offset)
+  assert(end_offset > start_offset, ('end_offset %d not > start_offset %d'):format(end_offset, start_offset))
   local curr = s:sub(start_offset, end_offset-1)
   return curr:match(pat)
 end
@@ -567,7 +566,7 @@ function Text.pos_at_start_of_screen_line(State, loc1)
       return spos,i
     end
   end
-  assert(false)
+  assert(false, ('invalid pos %d'):format(loc1.pos))
 end
 
 function Text.pos_at_end_of_screen_line(State, loc1)
@@ -581,7 +580,7 @@ function Text.pos_at_end_of_screen_line(State, loc1)
     end
     most_recent_final_pos = spos-1
   end
-  assert(false)
+  assert(false, ('invalid pos %d'):format(loc1.pos))
 end
 
 function Text.cursor_at_final_screen_line(State)
@@ -639,7 +638,7 @@ end
 function Text.to_pos_on_line(State, line_index, mx, my)
   local line = State.lines[line_index]
   local line_cache = State.line_cache[line_index]
-  assert(my >= line_cache.starty)
+  assert(my >= line_cache.starty, 'failed to map y pixel to line')
   -- duplicate some logic from Text.draw
   local y = line_cache.starty
   local start_screen_line_index = Text.screen_line_index(line_cache.screen_line_starting_pos, line_cache.startpos)
@@ -662,7 +661,7 @@ function Text.to_pos_on_line(State, line_index, mx, my)
     end
     y = nexty
   end
-  assert(false)
+  assert(false, 'failed to map y pixel to line')
 end
 
 function Text.screen_line_width(State, line_index, i)
@@ -728,7 +727,7 @@ function Text.nearest_cursor_pos(line, x, left)
       leftpos = curr
     end
   end
-  assert(false)
+  assert(false, 'failed to map x pixel to pos')
 end
 
 -- return the nearest index of line (in utf8 code points) which lies entirely
@@ -759,7 +758,7 @@ function Text.nearest_pos_less_than(line, x)
       left = curr
     end
   end
-  assert(false)
+  assert(false, 'failed to map x pixel to pos')
 end
 
 function Text.x_after(s, pos)
@@ -787,7 +786,7 @@ function Text.to2(State, loc1)
       break
     end
   end
-  assert(result.screen_pos)
+  assert(result.screen_pos, 'failed to convert schema-1 coordinate to schema-2')
   return result
 end
 
@@ -829,7 +828,7 @@ function Text.offset(s, pos1)
   if result == nil then
     print(pos1, #s, s)
   end
-  assert(result)
+  assert(result, "Text.offset returned nil; this is likely a failure to handle utf8")
   return result
 end
 

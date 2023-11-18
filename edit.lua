@@ -100,14 +100,8 @@ end
 -- return y drawn until
 function edit.draw(State)
   App.color(Text_color)
-  if #State.lines ~= #State.line_cache then
-    print(('line_cache is out of date; %d when it should be %d'):format(#State.line_cache, #State.lines))
-    assert(false)
-  end
-  if not Text.le1(State.screen_top1, State.cursor1) then
-    print(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos)
-    assert(false)
-  end
+  assert(#State.lines == #State.line_cache, ('line_cache is out of date; %d elements when it should be %d'):format(#State.line_cache, #State.lines))
+  assert(Text.le1(State.screen_top1, State.cursor1), ('screen_top (line=%d,pos=%d) is below cursor (line=%d,pos=%d)'):format(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos))
   State.cursor_x = nil
   State.cursor_y = nil
   local y = State.top
