@@ -128,7 +128,9 @@ function Text.populate_screen_line_starting_pos(State, line_index)
         -- long word; chop it at some letter
         -- We're not going to reimplement TeX here.
         local bpos = Text.nearest_pos_less_than(frag, State.width - x)
-        -- everything works if bpos == 0, but is a little inefficient
+        if x == 0 and bpos == 0 then
+          assert(false, ("Infinite loop while line-wrapping. Editor is %dpx wide; window is %dpx wide"):format(State.width, App.screen.width))
+        end
         pos = pos + bpos
         local boffset = Text.offset(frag, bpos+1)  -- byte _after_ bpos
         frag = string.sub(frag, boffset)
@@ -1035,6 +1037,12 @@ end
 
 function Text.redraw_all(State)
 --?   print('clearing fragments')
+  -- Perform some early sanity checking here, in hopes that we correctly call
+  -- this whenever we change editor state.
+  if State.right <= State.left then
+    assert(false, ('Right margin %d must be to the right of the left margin %d'):format(State.right, State.left))
+  end
+
   State.line_cache = {}
   for i=1,#State.lines do
     State.line_cache[i] = {}
