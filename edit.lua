@@ -151,6 +151,7 @@ end
 
 function edit.mouse_press(State, x,y, mouse_button)
   if State.search_term then return end
+  State.mouse_down = mouse_button
 --?   print_and_log(('edit.mouse_press: cursor at %d,%d'):format(State.cursor1.line, State.cursor1.pos))
   if y < State.top then
     State.old_cursor1 = State.cursor1
@@ -199,6 +200,7 @@ end
 function edit.mouse_release(State, x,y, mouse_button)
   if State.search_term then return end
 --?   print_and_log(('edit.mouse_release(%d,%d): cursor at %d,%d'):format(x,y, State.cursor1.line, State.cursor1.pos))
+  State.mouse_down = nil
   if y < State.top then
     State.cursor1 = {line=State.screen_top1.line, pos=State.screen_top1.pos}
     edit.clean_up_mouse_press(State)
