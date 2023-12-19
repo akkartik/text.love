@@ -9,8 +9,10 @@
 
 -- draw button and queue up event handlers
 function button(State, name, params)
-  love.graphics.setColor(params.bg.r, params.bg.g, params.bg.b, params.bg.a)
-  love.graphics.rectangle('fill', params.x,params.y, params.w,params.h, 5,5)
+  if params.bg then
+    love.graphics.setColor(params.bg.r, params.bg.g, params.bg.b, params.bg.a)
+    love.graphics.rectangle('fill', params.x,params.y, params.w,params.h, 5,5)
+  end
   if params.icon then params.icon(params) end
   table.insert(State.button_handlers, params)
 end
