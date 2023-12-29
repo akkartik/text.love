@@ -10,7 +10,7 @@ Margin_right = 25
 edit = {}
 
 -- run in both tests and a real run
-function edit.initialize_state(top, left, right, font_height, line_height)  -- currently always draws to bottom of screen
+function edit.initialize_state(top, left, right, font, font_height, line_height)  -- currently always draws to bottom of screen
   local result = {
     lines = {{data=''}},  -- array of strings
 
@@ -47,6 +47,7 @@ function edit.initialize_state(top, left, right, font_height, line_height)  -- c
     cursor_x = 0,
     cursor_y = 0,
 
+    font = font,
     font_height = font_height,
     line_height = line_height,
 
@@ -67,7 +68,7 @@ function edit.initialize_state(top, left, right, font_height, line_height)  -- c
     search_backup = nil,  -- stuff to restore when cancelling search
   }
   return result
-end  -- App.initialize_state
+end  -- edit.initialize_state
 
 function edit.check_locs(State)
   -- if State is inconsistent (i.e. file changed by some other program),
@@ -99,6 +100,7 @@ end
 
 -- return y drawn until
 function edit.draw(State)
+  love.graphics.setFont(State.font)
   App.color(Text_color)
   assert(#State.lines == #State.line_cache, ('line_cache is out of date; %d elements when it should be %d'):format(#State.line_cache, #State.lines))
   assert(Text.le1(State.screen_top1, State.cursor1), ('screen_top (line=%d,pos=%d) is below cursor (line=%d,pos=%d)'):format(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos))
@@ -384,7 +386,7 @@ end
 
 function edit.update_font_settings(State, font_height)
   State.font_height = font_height
-  love.graphics.setFont(love.graphics.newFont(State.font_height))
+  State.font = love.graphics.newFont(State.font_height)
   State.line_height = math.floor(font_height*1.3)
 end
 
@@ -401,7 +403,8 @@ function edit.initialize_test_state()
       15,  -- top margin
       Test_margin_left,
       App.screen.width - Test_margin_right,
-      14,  -- font height assuming default LÖVE font
+      love.graphics.getFont(),
+      14,
       15)  -- line height
 end
 
