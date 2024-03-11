@@ -66,6 +66,7 @@ Updates to it can be downloaded from the following mirrors:
 * https://repo.or.cz/text.love.git
 * https://tildegit.org/akkartik/text.love
 * https://git.tilde.institute/akkartik/text.love
+* https://git.merveilles.town/akkartik/text.love
 * https://git.sr.ht/~akkartik/text.love
 * https://github.com/akkartik/text.love
 * https://codeberg.org/akkartik/text.love
