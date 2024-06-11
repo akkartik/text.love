@@ -49,7 +49,6 @@ function test_press_ctrl()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.run_after_keychord(Editor_state, 'C-m', 'm')
 end
 
@@ -229,9 +228,8 @@ function test_click_moves_cursor()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
-  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
+  edit.draw(Editor_state)  -- populate line_cache.startpos for each line
   edit.run_after_mouse_release(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   check_eq(Editor_state.cursor1.line, 1, 'cursor:line')
   check_eq(Editor_state.cursor1.pos, 2, 'cursor:pos')
@@ -248,7 +246,6 @@ function test_click_to_left_of_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=3}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
   -- click to the left of the line
   edit.draw(Editor_state)
@@ -268,7 +265,6 @@ function test_click_takes_margins_into_account()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
   -- click on the other line
   edit.draw(Editor_state)
@@ -287,7 +283,6 @@ function test_click_on_empty_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
   -- click on the empty line
   edit.draw(Editor_state)
@@ -306,7 +301,6 @@ function test_click_below_all_lines()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
   -- click below first line
   edit.draw(Editor_state)
@@ -324,7 +318,6 @@ function test_draw_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'screen:1')
@@ -341,7 +334,6 @@ function test_draw_wrapping_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'screen:1')
@@ -358,7 +350,6 @@ function test_draw_word_wrapping_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc ', 'screen:1')
@@ -376,7 +367,6 @@ function test_click_on_wrapping_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=20}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- click on the other line
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
@@ -395,7 +385,6 @@ function test_click_on_wrapping_line_takes_margins_into_account()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=20}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- click on the other line
   edit.draw(Editor_state)
   edit.run_after_mouse_click(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
@@ -413,7 +402,6 @@ function test_draw_text_wrapping_within_word()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abcd ', 'screen:1')
@@ -431,7 +419,6 @@ function test_draw_wrapping_text_containing_non_ascii()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'mad', 'screen:1')
@@ -450,7 +437,6 @@ function test_click_past_end_of_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'madam ', 'baseline/screen:1')
@@ -473,7 +459,6 @@ function test_click_on_wrapping_line_rendered_from_partway_at_top_of_screen()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=8}
   Editor_state.screen_top1 = {line=1, pos=7}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, "I'm ad", 'baseline/screen:2')
@@ -494,7 +479,6 @@ function test_click_past_end_of_wrapping_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'madam ', 'baseline/screen:1')
@@ -518,7 +502,6 @@ function test_click_past_end_of_wrapping_line_containing_non_ascii()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'madam ', 'baseline/screen:1')
@@ -543,7 +526,6 @@ function test_click_past_end_of_word_wrapping_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'the quick brown fox ', 'baseline/screen:1')
@@ -562,7 +544,6 @@ function test_select_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- select a letter
   App.fake_key_press('lshift')
@@ -585,7 +566,6 @@ function test_cursor_movement_without_shift_resets_selection()
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.selection1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- press an arrow key without shift
   edit.run_after_keychord(Editor_state, 'right', 'right')
@@ -603,7 +583,6 @@ function test_edit_deletes_selection()
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.selection1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- press a key
   edit.run_after_text_input(Editor_state, 'x')
@@ -620,7 +599,6 @@ function test_edit_with_shift_key_deletes_selection()
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.selection1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- mimic precise keypresses for a capital letter
   App.fake_key_press('lshift')
@@ -642,7 +620,6 @@ function test_copy_does_not_reset_selection()
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.selection1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- copy selection
   edit.run_after_keychord(Editor_state, 'C-c', 'c')
@@ -660,7 +637,6 @@ function test_cut()
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.selection1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- press a key
   edit.run_after_keychord(Editor_state, 'C-x', 'x')
@@ -678,7 +654,6 @@ function test_paste_replaces_selection()
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.selection1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- set clipboard
   App.clipboard = 'xyz'
@@ -697,7 +672,6 @@ function test_deleting_selection_may_scroll()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=2}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'def', 'baseline/screen:1')
@@ -721,7 +695,6 @@ function test_edit_wrapping_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=4}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   edit.run_after_text_input(Editor_state, 'g')
   local y = Editor_state.top
@@ -740,7 +713,6 @@ function test_insert_newline()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -769,7 +741,6 @@ function test_insert_newline_at_start_of_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- hitting the enter key splits the line
   edit.run_after_keychord(Editor_state, 'return', 'return')
   check_eq(Editor_state.cursor1.line, 2, 'cursor:line')
@@ -786,7 +757,6 @@ function test_insert_from_clipboard()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -815,9 +785,8 @@ function test_select_text_using_mouse()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
-  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
+  edit.draw(Editor_state)  -- populate line_cache.startpos for each line
   -- press and hold on first location
   edit.run_after_mouse_press(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   -- drag and release somewhere else
@@ -835,9 +804,8 @@ function test_select_text_using_mouse_starting_above_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
-  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
+  edit.draw(Editor_state)  -- populate line_cache.startpos for each line
   -- press mouse above first line of text
   edit.run_after_mouse_press(Editor_state, Editor_state.left+8,5, 1)
   check(Editor_state.selection1.line ~= nil, 'selection:line-not-nil')
@@ -853,7 +821,6 @@ function test_select_text_using_mouse_starting_above_text_wrapping_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=5}
   Editor_state.screen_top1 = {line=2, pos=3}
-  Editor_state.screen_bottom1 = {}
   -- press mouse above first line of text
   edit.draw(Editor_state)
   edit.run_after_mouse_press(Editor_state, Editor_state.left+8,5, 1)
@@ -876,7 +843,6 @@ function test_select_text_using_mouse_starting_below_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'ab', 'baseline:screen:1')
@@ -897,9 +863,8 @@ function test_select_text_using_mouse_and_shift()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
-  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
+  edit.draw(Editor_state)  -- populate line_cache.startpos for each line
   -- click on first location
   edit.run_after_mouse_press(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   edit.run_after_mouse_release(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
@@ -922,9 +887,8 @@ function test_select_text_repeatedly_using_mouse_and_shift()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
-  edit.draw(Editor_state)  -- populate line_cache.starty for each line Editor_state.line_cache
+  edit.draw(Editor_state)  -- populate line_cache.startpos for each line
   -- click on first location
   edit.run_after_mouse_press(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
   edit.run_after_mouse_release(Editor_state, Editor_state.left+8,Editor_state.top+5, 1)
@@ -952,7 +916,6 @@ function test_select_all_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- select all
   App.fake_key_press('lctrl')
@@ -974,7 +937,6 @@ function test_cut_without_selection()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   Editor_state.selection1 = {}
   edit.draw(Editor_state)
   -- try to cut without selecting text
@@ -990,7 +952,6 @@ function test_pagedown()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- initially the first two lines are displayed
   edit.draw(Editor_state)
   local y = Editor_state.top
@@ -1007,36 +968,6 @@ function test_pagedown()
   App.screen.check(y, 'ghi', 'screen:2')
 end
 
-function test_pagedown_often_shows_start_of_wrapping_line()
-  -- draw a few lines ending in part of a wrapping line
-  App.screen.init{width=50, height=60}
-  Editor_state = edit.initialize_test_state()
-  Editor_state.lines = load_array{'abc', 'def ghi jkl', 'mno'}
-  Text.redraw_all(Editor_state)
-  Editor_state.cursor1 = {line=1, pos=1}
-  Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
-  edit.draw(Editor_state)
-  local y = Editor_state.top
-  App.screen.check(y, 'abc', 'baseline/screen:1')
-  y = y + Editor_state.line_height
-  App.screen.check(y, 'def ', 'baseline/screen:2')
-  y = y + Editor_state.line_height
-  App.screen.check(y, 'ghi ', 'baseline/screen:3')
-  -- after pagedown we start drawing from the bottom _line_ (multiple screen lines)
-  edit.run_after_keychord(Editor_state, 'pagedown', 'pagedown')
-  check_eq(Editor_state.screen_top1.line, 2, 'screen_top:line')
-  check_eq(Editor_state.screen_top1.pos, 1, 'screen_top:pos')
-  check_eq(Editor_state.cursor1.line, 2, 'cursor:line')
-  check_eq(Editor_state.cursor1.pos, 1, 'cursor:pos')
-  y = Editor_state.top
-  App.screen.check(y, 'def ', 'screen:1')
-  y = y + Editor_state.line_height
-  App.screen.check(y, 'ghi ', 'screen:2')
-  y = y + Editor_state.line_height
-  App.screen.check(y, 'jkl', 'screen:3')
-end
-
 function test_pagedown_can_start_from_middle_of_long_wrapping_line()
   -- draw a few lines starting from a very long wrapping line
   App.screen.init{width=Editor_state.left+30, height=60}
@@ -1045,7 +976,6 @@ function test_pagedown_can_start_from_middle_of_long_wrapping_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc ', 'baseline/screen:1')
@@ -1080,7 +1010,6 @@ function test_pagedown_never_moves_up()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=9}
   Editor_state.screen_top1 = {line=1, pos=9}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- pagedown makes no change
   edit.run_after_keychord(Editor_state, 'pagedown', 'pagedown')
@@ -1095,7 +1024,6 @@ function test_down_arrow_moves_cursor()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- initially the first three lines are displayed
   edit.draw(Editor_state)
   local y = Editor_state.top
@@ -1125,7 +1053,6 @@ function test_down_arrow_scrolls_down_by_one_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1153,7 +1080,6 @@ function test_down_arrow_scrolls_down_by_one_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1182,7 +1108,6 @@ function test_down_arrow_scrolls_down_by_one_screen_line_after_splitting_within_
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1210,7 +1135,6 @@ function test_pagedown_followed_by_down_arrow_does_not_scroll_screen_up()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1244,7 +1168,6 @@ function test_up_arrow_moves_cursor()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1273,7 +1196,6 @@ function test_up_arrow_scrolls_up_by_one_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'def', 'baseline/screen:1')
@@ -1301,7 +1223,6 @@ function test_up_arrow_scrolls_up_by_one_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=6}
   Editor_state.screen_top1 = {line=3, pos=5}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'jkl', 'baseline/screen:1')
@@ -1329,7 +1250,6 @@ function test_up_arrow_scrolls_up_to_final_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'ghi', 'baseline/screen:1')
@@ -1359,7 +1279,6 @@ function test_up_arrow_scrolls_up_to_empty_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1386,7 +1305,6 @@ function test_pageup()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- initially the last two lines are displayed
   edit.draw(Editor_state)
   local y = Editor_state.top
@@ -1411,7 +1329,6 @@ function test_pageup_scrolls_up_by_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'ghi', 'baseline/screen:1')
@@ -1440,7 +1357,6 @@ function test_pageup_scrolls_up_from_middle_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=5}
   Editor_state.screen_top1 = {line=2, pos=5}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'jkl', 'baseline/screen:2')
@@ -1467,7 +1383,6 @@ function test_enter_on_bottom_line_scrolls_down()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1496,7 +1411,6 @@ function test_enter_on_final_line_avoids_scrolling_down_when_not_at_bottom()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=4, pos=2}
   Editor_state.screen_top1 = {line=4, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'jkl', 'baseline/screen:1')
@@ -1519,7 +1433,6 @@ function test_inserting_text_on_final_line_avoids_scrolling_down_when_not_at_bot
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- after hitting the inserting_text key the screen does not scroll down
   edit.run_after_text_input(Editor_state, 'a')
@@ -1538,7 +1451,6 @@ function test_typing_on_bottom_line_scrolls_down()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=4}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc', 'baseline/screen:1')
@@ -1568,7 +1480,6 @@ function test_left_arrow_scrolls_up_in_wrapped_line()
   Editor_state.lines = load_array{'abc', 'def', 'ghi jkl', 'mno'}
   Text.redraw_all(Editor_state)
   Editor_state.screen_top1 = {line=3, pos=5}
-  Editor_state.screen_bottom1 = {}
   -- cursor is at top of screen
   Editor_state.cursor1 = {line=3, pos=5}
   edit.draw(Editor_state)
@@ -1597,7 +1508,6 @@ function test_right_arrow_scrolls_down_in_wrapped_line()
   Editor_state.lines = load_array{'abc', 'def', 'ghi jkl', 'mno'}
   Text.redraw_all(Editor_state)
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- cursor is at bottom right of screen
   Editor_state.cursor1 = {line=3, pos=5}
   edit.draw(Editor_state)
@@ -1627,7 +1537,6 @@ function test_home_scrolls_up_in_wrapped_line()
   Editor_state.lines = load_array{'abc', 'def', 'ghi jkl', 'mno'}
   Text.redraw_all(Editor_state)
   Editor_state.screen_top1 = {line=3, pos=5}
-  Editor_state.screen_bottom1 = {}
   -- cursor is at top of screen
   Editor_state.cursor1 = {line=3, pos=5}
   edit.draw(Editor_state)
@@ -1656,7 +1565,6 @@ function test_end_scrolls_down_in_wrapped_line()
   Editor_state.lines = load_array{'abc', 'def', 'ghi jkl', 'mno'}
   Text.redraw_all(Editor_state)
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- cursor is at bottom right of screen
   Editor_state.cursor1 = {line=3, pos=5}
   edit.draw(Editor_state)
@@ -1687,7 +1595,6 @@ function test_position_cursor_on_recently_edited_wrapping_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=25}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'abc def ghi ', 'baseline1/screen:1')
@@ -1721,7 +1628,6 @@ function test_backspace_can_scroll_up()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=2, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'def', 'baseline/screen:1')
@@ -1749,7 +1655,6 @@ function test_backspace_can_scroll_up_screen_line()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=3, pos=5}
   Editor_state.screen_top1 = {line=3, pos=5}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   local y = Editor_state.top
   App.screen.check(y, 'jkl', 'baseline/screen:1')
@@ -1884,7 +1789,6 @@ function test_undo_insert_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=4}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- insert a character
   edit.draw(Editor_state)
   edit.run_after_text_input(Editor_state, 'g')
@@ -1919,7 +1823,6 @@ function test_undo_delete_text()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=5}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   -- delete a character
   edit.run_after_keychord(Editor_state, 'backspace', 'backspace')
   check_eq(Editor_state.cursor1.line, 2, 'baseline/cursor:line')
@@ -1958,7 +1861,6 @@ function test_undo_restores_selection()
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.selection1 = {line=1, pos=2}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- delete selected text
   edit.run_after_text_input(Editor_state, 'x')
@@ -1979,7 +1881,6 @@ function test_search()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- search for a string
   edit.run_after_keychord(Editor_state, 'C-f', 'f')
@@ -2006,7 +1907,6 @@ function test_search_upwards()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- search for a string
   edit.run_after_keychord(Editor_state, 'C-f', 'f')
@@ -2024,7 +1924,6 @@ function test_search_wrap()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=2, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- search for a string
   edit.run_after_keychord(Editor_state, 'C-f', 'f')
@@ -2042,7 +1941,6 @@ function test_search_wrap_upwards()
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
-  Editor_state.screen_bottom1 = {}
   edit.draw(Editor_state)
   -- search upwards for a string
   edit.run_after_keychord(Editor_state, 'C-f', 'f')

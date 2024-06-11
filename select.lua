@@ -69,7 +69,7 @@ end
 
 function Text.mouse_pos(State)
   local x,y = App.mouse_x(), App.mouse_y()
-  if y < State.line_cache[State.screen_top1.line].starty then
+  if y < State.top then
     return State.screen_top1.line, State.screen_top1.pos
   end
   for line_index,line in ipairs(State.lines) do
@@ -77,7 +77,8 @@ function Text.mouse_pos(State)
       return line_index, Text.to_pos_on_line(State, line_index, x,y)
     end
   end
-  return State.screen_bottom1.line, Text.pos_at_end_of_screen_line(State, State.screen_bottom1)
+  local screen_bottom1 = Text.screen_bottom1(State)
+  return screen_bottom1.line, Text.pos_at_end_of_screen_line(State, screen_bottom1)
 end
 
 function Text.cut_selection(State)
