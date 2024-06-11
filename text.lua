@@ -440,45 +440,45 @@ function Text.up(State)
 end
 
 function Text.down(State)
-  print('down', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos)
+--?   print('down', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos)
   assert(State.cursor1.pos, 'cursor has no pos')
   if Text.cursor_at_final_screen_line(State) then
     -- line is done, skip to next text line
-    print('cursor at final screen line of its line')
+--?     print('cursor at final screen line of its line')
     if State.cursor1.line < #State.lines then
       local new_cursor_line = State.cursor1.line+1
       State.cursor1.line = new_cursor_line
       State.cursor1.pos = Text.nearest_cursor_pos(State.font, State.lines[State.cursor1.line].data, State.cursor_x, State.left)
-      print(State.cursor1.pos)
+--?       print(State.cursor1.pos)
     end
     local screen_bottom1 = Text.screen_bottom1(State)
-  print('down 2', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos, screen_bottom1.line, screen_bottom1.pos)
+--?   print('down 2', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos, screen_bottom1.line, screen_bottom1.pos)
     if State.cursor1.line > screen_bottom1.line then
-      print('screen top before:', State.screen_top1.line, State.screen_top1.pos)
-      print('scroll up preserving cursor')
+--?       print('screen top before:', State.screen_top1.line, State.screen_top1.pos)
+--?       print('scroll up preserving cursor')
       Text.snap_cursor_to_bottom_of_screen(State)
-      print('screen top after:', State.screen_top1.line, State.screen_top1.pos)
+--?       print('screen top after:', State.screen_top1.line, State.screen_top1.pos)
     end
   else
     -- move down one screen line in current line
     local screen_bottom1 = Text.screen_bottom1(State)
     local scroll_down = Text.le1(screen_bottom1, State.cursor1)
-    print('cursor is NOT at final screen line of its line')
+--?     print('cursor is NOT at final screen line of its line')
     local screen_line_starting_pos, screen_line_index = Text.pos_at_start_of_screen_line(State, State.cursor1)
     Text.populate_screen_line_starting_pos(State, State.cursor1.line)
     local new_screen_line_starting_pos = State.line_cache[State.cursor1.line].screen_line_starting_pos[screen_line_index+1]
-    print('switching pos of screen line at cursor from '..tostring(screen_line_starting_pos)..' to '..tostring(new_screen_line_starting_pos))
+--?     print('switching pos of screen line at cursor from '..tostring(screen_line_starting_pos)..' to '..tostring(new_screen_line_starting_pos))
     local new_screen_line_starting_byte_offset = Text.offset(State.lines[State.cursor1.line].data, new_screen_line_starting_pos)
     local s = string.sub(State.lines[State.cursor1.line].data, new_screen_line_starting_byte_offset)
     State.cursor1.pos = new_screen_line_starting_pos + Text.nearest_cursor_pos(State.font, s, State.cursor_x, State.left) - 1
-    print('cursor pos is now', State.cursor1.line, State.cursor1.pos)
+--?     print('cursor pos is now', State.cursor1.line, State.cursor1.pos)
     if scroll_down then
-      print('scroll up preserving cursor')
+--?       print('scroll up preserving cursor')
       Text.snap_cursor_to_bottom_of_screen(State)
-      print('screen top after:', State.screen_top1.line, State.screen_top1.pos)
+--?       print('screen top after:', State.screen_top1.line, State.screen_top1.pos)
     end
   end
-  print('=>', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos)
+--?   print('=>', State.cursor1.line, State.cursor1.pos, State.screen_top1.line, State.screen_top1.pos)
 end
 
 function Text.start_of_line(State)
