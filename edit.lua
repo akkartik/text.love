@@ -243,7 +243,6 @@ function edit.mouse_wheel_move(State, dx,dy)
     end
   elseif dy < 0 then
     State.cursor1 = Text.screen_bottom1(State)
-    edit.put_cursor_on_next_text_line(State)
     for i=1,math.floor(-dy) do
       Text.down(State)
     end
