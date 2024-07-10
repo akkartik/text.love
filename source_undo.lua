@@ -57,16 +57,8 @@ function snapshot(State, s,e)
     end_line=e,
     -- no filename; undo history is cleared when filename changes
   }
-  -- deep copy lines without cached stuff like text fragments
   for i=s,e do
-    local line = State.lines[i]
-    if line.mode == 'text' then
-      table.insert(event.lines, {mode='text', data=line.data})  -- I've forgotten: should we deepcopy(line.data)?
-    elseif line.mode == 'drawing' then
-      table.insert(event.lines, {mode='drawing', h=line.h, points=deepcopy(line.points), shapes=deepcopy(line.shapes), pending={}})
-    else
-      assert(false, ('unknown line mode %s'):format(line.mode))
-    end
+    table.insert(event.lines, deepcopy(State.lines[i]))
   end
   return event
 end
@@ -86,17 +78,6 @@ function patch(lines, from, to)
   assert(#to.lines == to.end_line-to.start_line+1, 'failed to patch undo operation')
   for i=1,#to.lines do
     table.insert(lines, to.start_line+i-1, to.lines[i])
-  end
-end
-
-function patch_placeholders(line_cache, from, to)
-  assert(from.start_line == to.start_line, 'failed to patch undo operation')
-  for i=from.end_line,from.start_line,-1 do
-    table.remove(line_cache, i)
-  end
-  assert(#to.lines == to.end_line-to.start_line+1, 'failed to patch undo operation')
-  for i=1,#to.lines do
-    table.insert(line_cache, to.start_line+i-1, {})
   end
 end
 
