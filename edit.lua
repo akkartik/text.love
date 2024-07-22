@@ -365,9 +365,8 @@ function edit.keychord_press(State, chord, key)
     if Text.cursor_out_of_screen(State) then
       Text.snap_cursor_to_bottom_of_screen(State, State.left, State.right)
     end
-    schedule_save(State)
     record_undo_event(State, {before=before, after=snapshot(State, before_line, State.cursor1.line)})
-  -- dispatch to text
+    schedule_save(State)
   else
     Text.keychord_press(State, chord)
   end

@@ -198,7 +198,7 @@ function Text.text_input(State, t)
   if App.mouse_down(1) then return end
   if App.any_modifier_down() then
     if App.key_down(t) then
-      -- The modifiers didn't change the key. Handle it in keychord_pressed.
+      -- The modifiers didn't change the key. Handle it in keychord_press.
       return
     else
       -- Key mutated by the keyboard layout. Continue below.
@@ -230,12 +230,11 @@ function Text.keychord_press(State, chord)
     local before_line = State.cursor1.line
     local before = snapshot(State, before_line)
     Text.insert_return(State)
-    State.selection1 = {}
     if State.cursor_y > App.screen.height - State.line_height then
       Text.snap_cursor_to_bottom_of_screen(State, State.left, State.right)
     end
-    schedule_save(State)
     record_undo_event(State, {before=before, after=snapshot(State, before_line, State.cursor1.line)})
+    schedule_save(State)
   elseif chord == 'tab' then
     local before = snapshot(State, State.cursor1.line)
 --?     print(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos)
@@ -245,8 +244,8 @@ function Text.keychord_press(State, chord)
       Text.snap_cursor_to_bottom_of_screen(State, State.left, State.right)
 --?       print('=>', State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos)
     end
-    schedule_save(State)
     record_undo_event(State, {before=before, after=snapshot(State, State.cursor1.line)})
+    schedule_save(State)
   elseif chord == 'backspace' then
     if State.selection1.line then
       Text.delete_selection(State, State.left, State.right)
@@ -293,8 +292,8 @@ function Text.keychord_press(State, chord)
     end
     Text.clear_screen_line_cache(State, State.cursor1.line)
     assert(Text.le1(State.screen_top1, State.cursor1), ('screen_top (line=%d,pos=%d) is below cursor (line=%d,pos=%d)'):format(State.screen_top1.line, State.screen_top1.pos, State.cursor1.line, State.cursor1.pos))
-    schedule_save(State)
     record_undo_event(State, {before=before, after=snapshot(State, State.cursor1.line)})
+    schedule_save(State)
   elseif chord == 'delete' then
     if State.selection1.line then
       Text.delete_selection(State, State.left, State.right)
@@ -327,8 +326,8 @@ function Text.keychord_press(State, chord)
       table.remove(State.line_cache, State.cursor1.line+1)
     end
     Text.clear_screen_line_cache(State, State.cursor1.line)
-    schedule_save(State)
     record_undo_event(State, {before=before, after=snapshot(State, State.cursor1.line)})
+    schedule_save(State)
   --== shortcuts that move the cursor
   elseif chord == 'left' then
     Text.left(State)
