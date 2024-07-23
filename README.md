@@ -90,4 +90,5 @@ Further forks are encouraged. If you show me your fork, I'll link to it here.
 
 ## Feedback
 
-[Most appreciated.](http://akkartik.name/contact)
+[Most appreciated.](http://akkartik.name/contact) Messages, PRs, patches,
+forks, it's all good.
