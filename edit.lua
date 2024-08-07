@@ -97,7 +97,6 @@ function edit.invalid_cursor1(State)
   return cursor1.pos > #State.lines[cursor1.line].data + 1
 end
 
--- return y drawn until
 function edit.draw(State)
   love.graphics.setFont(State.font)
   App.color(Text_color)
@@ -122,7 +121,6 @@ function edit.draw(State)
   if State.search_term then
     Text.draw_search_bar(State)
   end
-  return y
 end
 
 function edit.update(State, dt)
