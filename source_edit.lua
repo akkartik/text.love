@@ -190,6 +190,7 @@ function edit.draw(State, hide_cursor, show_line_numbers)
                          State.cursor1.line = State.cursor1.line+1
                        end
                        record_undo_event(State, {before=Drawing.before, after=snapshot(State, line_index-1, line_index+1)})
+                       Drawing.before = nil
                        schedule_save(State)
                      end,
         })
@@ -391,7 +392,7 @@ function edit.keychord_press(State, chord, key)
       -- (we're not creating any ctrl-shift- or alt-shift- combinations using regular/printable keys)
       (not App.shift_down() or utf8.len(key) == 1) and
       chord ~= 'C-a' and chord ~= 'C-c' and chord ~= 'C-x' and chord ~= 'backspace' and chord ~= 'delete' and chord ~= 'C-z' and chord ~= 'C-y' and not App.is_cursor_movement(key) then
-    Text.delete_selection(State, State.left, State.right)
+    Text.delete_selection_and_record_undo_event(State)
   end
   if State.search_term then
     if chord == 'escape' then
@@ -469,7 +470,7 @@ function edit.keychord_press(State, chord, key)
       App.set_clipboard(s)
     end
   elseif chord == 'C-x' then
-    local s = Text.cut_selection(State, State.left, State.right)
+    local s = Text.cut_selection_and_record_undo_event(State)
     if s then
       App.set_clipboard(s)
     end
