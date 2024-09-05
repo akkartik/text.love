@@ -1,5 +1,7 @@
 # An editor for plain text.
 
+[![0 dependencies!](https://0dependencies.dev/0dependencies.svg)](https://0dependencies.dev)
+
 Not very useful by itself, but it's a fork of [lines.love](http://akkartik.name/lines.html)
 that you can take in other directions besides line drawings, while easily
 sharing patches between forks.
