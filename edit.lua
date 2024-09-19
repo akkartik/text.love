@@ -1,7 +1,7 @@
 -- some constants people might like to tweak
 Text_color = {r=0, g=0, b=0}
 Cursor_color = {r=1, g=0, b=0}
-Highlight_color = {r=0.7, g=0.7, b=0.9}  -- selected text
+Highlight_color = {r=0.7, g=0.7, b=0.9, a=0.4}  -- selected text
 
 Margin_top = 15
 Margin_left = 25
