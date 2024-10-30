@@ -97,7 +97,7 @@ function edit.invalid_cursor1(State)
   return cursor1.pos > #State.lines[cursor1.line].data + 1
 end
 
-function edit.put_cursor_on_next_text_line_wrapping_around_if_necessary(State)
+function edit.put_cursor_on_next_line_wrapping_around_if_necessary(State)
   local line = State.cursor1.line
   local max = #State.lines
   for _ = 1, max-1 do
@@ -115,7 +115,7 @@ function edit.put_cursor_on_next_loc_wrapping_around_if_necessary(State)
   if State.cursor1.pos <= utf8.len(cursor_line) then
     State.cursor1.pos = State.cursor1.pos + 1
   else
-    edit.put_cursor_on_next_text_line_wrapping_around_if_necessary(State)
+    edit.put_cursor_on_next_line_wrapping_around_if_necessary(State)
   end
 end
 
@@ -209,7 +209,7 @@ function edit.mouse_press(State, x,y, mouse_button)
   State.old_cursor1 = State.cursor1
   State.old_selection1 = State.selection1
   State.mousepress_shift = App.shift_down()
-  State.selection1 = Text.final_text_loc_on_screen(State)
+  State.selection1 = Text.final_loc_on_screen(State)
 end
 
 function edit.mouse_release(State, x,y, mouse_button)
@@ -235,7 +235,7 @@ function edit.mouse_release(State, x,y, mouse_button)
   end
 
   -- still here? mouse release is below all screen lines
-  State.cursor1 = Text.final_text_loc_on_screen(State)
+  State.cursor1 = Text.final_loc_on_screen(State)
   edit.clean_up_mouse_press(State)
 --?   print_and_log(('edit.mouse_release: finally selection %s,%s cursor %d,%d'):format(tostring(State.selection1.line), tostring(State.selection1.pos), State.cursor1.line, State.cursor1.pos))
 end

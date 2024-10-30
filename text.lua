@@ -610,7 +610,7 @@ function Text.pos_at_end_of_screen_line(State, loc1)
   assert(false, ('invalid pos %d'):format(loc1.pos))
 end
 
-function Text.final_text_loc_on_screen(State)
+function Text.final_loc_on_screen(State)
   local screen_bottom1 = Text.screen_bottom1(State)
   return {
     line=screen_bottom1.line,
@@ -926,7 +926,7 @@ function Text.tweak_screen_top_and_cursor(State)
     State.cursor1 = deepcopy(State.screen_top1)
   elseif State.cursor1.line >= screen_bottom1.line then
     if Text.cursor_out_of_screen(State) then
-      State.cursor1 = Text.final_text_loc_on_screen(State)
+      State.cursor1 = Text.final_loc_on_screen(State)
     end
   end
 end
