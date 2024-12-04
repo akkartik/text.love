@@ -47,7 +47,7 @@ end
 function load_array(a)
   local result = {}
   local next_line = ipairs(a)
-  local i,line,drawing = 0, ''
+  local i,line = 0, ''
   while true do
     i,line = next_line(a, i)
     if i == nil then break end
