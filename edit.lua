@@ -145,7 +145,7 @@ function edit.quit(State)
   end
 end
 
-function edit.mouse_press(State, x,y, mouse_button)
+function edit.mouse_press(State, x,y, mouse_button, is_touch, presses)
   if State.search_term then return end
   State.mouse_down = mouse_button
 --?   print_and_log(('edit.mouse_press: cursor at %d,%d'):format(State.cursor1.line, State.cursor1.pos))
@@ -190,7 +190,7 @@ function edit.mouse_press(State, x,y, mouse_button)
   State.selection1 = Text.final_loc_on_screen(State)
 end
 
-function edit.mouse_release(State, x,y, mouse_button)
+function edit.mouse_release(State, x,y, mouse_button, is_touch, presses)
   if State.search_term then return end
 --?   print_and_log(('edit.mouse_release(%d,%d): cursor at %d,%d'):format(x,y, State.cursor1.line, State.cursor1.pos))
   State.mouse_down = nil
@@ -257,7 +257,7 @@ function edit.text_input(State, t)
   schedule_save(State)
 end
 
-function edit.keychord_press(State, chord, key)
+function edit.keychord_press(State, chord, key, scancode, is_repeat)
   if State.selection1.line and
       -- printable character created using shift key => delete selection
       -- (we're not creating any ctrl-shift- or alt-shift- combinations using regular/printable keys)
@@ -367,7 +367,7 @@ function edit.keychord_press(State, chord, key)
     record_undo_event(State, {before=before, after=snapshot(State, before_line, State.cursor1.line)})
     schedule_save(State)
   else
-    Text.keychord_press(State, chord)
+    Text.keychord_press(State, chord, key, scancode, is_repeat)
   end
 end
 
