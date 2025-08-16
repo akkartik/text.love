@@ -1867,7 +1867,7 @@ end
 function test_search()
   App.screen.init{width=120, height=60}
   Editor_state = edit.initialize_test_state()
-  Editor_state.lines = load_array{'```lines', '```', 'def', 'ghi', '’deg'}  -- contains unicode quote in final line
+  Editor_state.lines = load_array{'abc', 'def', 'ghi', '’deg'}  -- contains unicode quote in final line
   Text.redraw_all(Editor_state)
   Editor_state.cursor1 = {line=1, pos=1}
   Editor_state.screen_top1 = {line=1, pos=1}
