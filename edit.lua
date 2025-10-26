@@ -65,6 +65,8 @@ function edit.initialize_state(top, left, right, font, font_height, line_height)
     -- search
     search_term = nil,
     search_backup = nil,  -- stuff to restore when cancelling search
+
+    button_handlers = {},
   }
   return result
 end  -- edit.initialize_state
